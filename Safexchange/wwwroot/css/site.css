@@ -20,3 +20,25 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.product-thumb {
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-detail-img {
+  min-height: 320px;
+  max-height: 480px;
+  object-fit: contain;
+}
+
+.cart-item-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.15s ease;
+}

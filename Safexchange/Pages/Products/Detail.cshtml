@@ -1,0 +1,87 @@
+@page "{id:int}"
+@model Safexchange.Pages.Products.DetailModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = Model.Product?.Title ?? "Chi tiết sản phẩm";
+    var p = Model.Product!;
+    var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+}
+<input type="hidden" name="__RequestVerificationToken" value="@requestToken" />
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Products/Index">Sản phẩm</a></li>
+        <li class="breadcrumb-item active">@p.Title</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+        {
+            <img src="@Model.CoverImageUrl" class="img-fluid rounded shadow-sm w-100 product-detail-img" alt="@p.Title" />
+        }
+        else
+        {
+            <div class="product-detail-img bg-light rounded d-flex align-items-center justify-content-center text-muted">
+                Không có ảnh
+            </div>
+        }
+    </div>
+    <div class="col-md-7">
+        <h1 class="h3">@p.Title</h1>
+        <p class="text-muted">@p.Category.CategoryName · @p.ConditionStatus · @p.Status.StatusName</p>
+        <p class="display-6 text-primary fw-bold mb-3">@p.Price.ToString("N0") đ</p>
+        @if (p.OriginalPrice.HasValue && p.OriginalPrice > p.Price)
+        {
+            <p class="text-muted"><del>@p.OriginalPrice.Value.ToString("N0") đ</del></p>
+        }
+        <p class="mb-1"><strong>Người bán:</strong> @p.Seller.FullName</p>
+        <p class="mb-3"><strong>Lượt xem:</strong> @p.ViewCount</p>
+
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <button type="button" class="btn btn-primary" onclick="ProductActions.buyNow(@p.ProductId)">
+                Mua ngay
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="ProductActions.addToCart(@p.ProductId)">
+                Thêm vào giỏ hàng
+            </button>
+            <button type="button" class="btn btn-outline-secondary" onclick="Cart.openView()">
+                Xem giỏ hàng
+            </button>
+        </div>
+
+        <h5>Mô tả</h5>
+        <p class="text-secondary">@(string.IsNullOrWhiteSpace(p.Description) ? "Chưa có mô tả." : p.Description)</p>
+
+        @if (p.Combos.Any())
+        {
+            <h5 class="mt-4">Thành phần combo</h5>
+            <ul class="list-group">
+                @foreach (var combo in p.Combos)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@combo.ItemName x@combo.Quantity</span>
+                        @if (combo.EstimatedValue.HasValue)
+                        {
+                            <span class="text-muted">~@combo.EstimatedValue.Value.ToString("N0") đ</span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<div id="product-toast" class="toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert">
+    <div class="d-flex">
+        <div class="toast-body" id="product-toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+    <script src="~/js/product-actions.js" asp-append-version="true"></script>
+    <script>Cart.refreshBadge();</script>
+}

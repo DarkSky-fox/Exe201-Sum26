@@ -1,0 +1,36 @@
+@model Safexchange.Pages.Orders.EditModel
+@{
+    var o = Model.Order!;
+}
+
+<form id="order-edit-form" onsubmit="OrderEdit.save(event, @o.OrderId)">
+    <p class="mb-2"><strong>Sản phẩm:</strong> @o.Product.Title</p>
+    <ul class="list-unstyled small text-muted mb-3">
+        <li>Giá sản phẩm: @o.ItemPrice.ToString("N0") đ</li>
+        <li>Phí nền tảng: @o.PlatformFee.ToString("N0") đ</li>
+        <li>Giảm giá hiện tại: @o.DiscountAmount.ToString("N0") đ</li>
+    </ul>
+
+    <div class="mb-3">
+        <label class="form-label" for="shippingFee">Phí vận chuyển (đ)</label>
+        <input type="number" class="form-control" id="shippingFee" name="shippingFee"
+               value="@((int)o.ShippingFee)" min="0" step="1000" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="voucherCode">Mã voucher (tùy chọn)</label>
+        <input type="text" class="form-control" id="voucherCode" name="voucherCode"
+               value="@Model.VoucherCode" placeholder="Nhập mã giảm giá" />
+    </div>
+
+    <div class="alert alert-light border mb-3">
+        <strong>Tổng thanh toán dự kiến:</strong>
+        @o.TotalAmount.ToString("N0") đ
+        <span class="d-block small text-muted">(sẽ tính lại sau khi lưu)</span>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+        <button type="submit" class="btn btn-primary btn-sm">Lưu thay đổi</button>
+    </div>
+</form>
