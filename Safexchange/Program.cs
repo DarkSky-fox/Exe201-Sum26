@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Safexchange.Models;
+
 namespace Safexchange
 {
     public class Program
@@ -8,6 +11,10 @@ namespace Safexchange
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            //DB connect
+            builder.Services.AddDbContext<SafexchangeDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
