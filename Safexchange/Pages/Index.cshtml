@@ -1,10 +1,12 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Trang chủ";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center py-5">
+    <h1 class="display-5 mb-3">Chào mừng đến Safexchange</h1>
+    <p class="lead text-muted mb-4">Nền tảng mua bán đồ dùng cũ trong trường học</p>
+    <a asp-page="/Products/Index" class="btn btn-primary btn-lg me-2">Xem sản phẩm</a>
+    <button type="button" class="btn btn-outline-primary btn-lg" onclick="Cart.openView()">Giỏ hàng</button>
 </div>

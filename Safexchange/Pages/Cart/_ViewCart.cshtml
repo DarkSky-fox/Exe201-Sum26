@@ -1,0 +1,47 @@
+@model Safexchange.Pages.Cart.IndexModel
+
+@if (!Model.Items.Any())
+{
+    <p class="text-muted mb-0">Giỏ hàng của bạn đang trống.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-3">
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Đơn giá</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-end">Tạm tính</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="" class="cart-item-thumb rounded" />
+                                }
+                                <span>@item.Title</span>
+                            </div>
+                        </td>
+                        <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-end fw-semibold">@item.LineTotal.ToString("N0") đ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+        <strong>Tổng cộng: @Model.Total.ToString("N0") đ</strong>
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="Cart.openEdit()">Chỉnh sửa giỏ</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="Cart.checkout()">Đặt hàng</button>
+        </div>
+    </div>
+}

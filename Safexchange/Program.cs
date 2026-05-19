@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
+using Safexchange.Services;
 
 namespace Safexchange
 {
@@ -9,16 +10,25 @@ namespace Safexchange
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(2);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
-            //DB connect
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
             builder.Services.AddDbContext<SafexchangeDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
@@ -27,6 +37,7 @@ namespace Safexchange
 
             app.UseRouting();
 
+            app.UseSession();
             app.UseAuthorization();
 
             app.MapRazorPages();

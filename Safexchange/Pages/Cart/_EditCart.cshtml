@@ -1,0 +1,45 @@
+@model Safexchange.Pages.Cart.IndexModel
+
+@if (!Model.Items.Any())
+{
+    <p class="text-muted mb-0">Giỏ hàng trống, không có gì để chỉnh sửa.</p>
+}
+else
+{
+    <form id="cart-edit-form" onsubmit="Cart.saveEdit(event)">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th class="text-end">Đơn giá</th>
+                        <th class="text-center" style="width:100px;">Số lượng</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr data-product-id="@item.ProductId">
+                            <td>@item.Title</td>
+                            <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center cart-qty-input"
+                                       name="quantity_@item.ProductId" value="@item.Quantity" min="0" max="99"
+                                       data-product-id="@item.ProductId" />
+                            </td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-link btn-sm text-danger p-0"
+                                        onclick="Cart.removeItem(@item.ProductId)">Xóa</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-end gap-2 border-top pt-3">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="Cart.openView()">Hủy</button>
+            <button type="submit" class="btn btn-primary btn-sm">Lưu giỏ hàng</button>
+        </div>
+    </form>
+}
