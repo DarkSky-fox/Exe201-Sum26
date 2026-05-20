@@ -1,0 +1,349 @@
+﻿@page
+@model Safexchange.Pages.RegisterModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="register-page">
+
+    <div class="register-card">
+
+        <!-- LEFT SIDE -->
+        <div class="left-side">
+
+            <div class="content">
+
+                <h1>Join Safexchange</h1>
+
+                <p>
+                    Buy & Sell Second-Hand Items For Students
+                </p>
+
+                <div class="features">
+
+                    <div class="feature-box">
+                        Affordable Student Prices
+                    </div>
+
+                    <div class="feature-box">
+                        Trusted University Community
+                    </div>
+
+                    <div class="feature-box">
+                        Fast & Easy Marketplace
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right-side">
+
+            <div class="form-container">
+
+                <h2>Create Account</h2>
+
+                <p class="subtitle">
+                    Start your student marketplace journey
+                </p>
+
+                <form method="post">
+
+                    <div class="input-group">
+                        <label>Full Name</label>
+
+                        <input asp-for="Input.FullName"
+                               class="custom-input"
+                               placeholder="Enter your full name" />
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email</label>
+
+                        <input asp-for="Input.Email"
+                               class="custom-input"
+                               placeholder="Enter your email" />
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+
+                        <input asp-for="Password"
+                               type="password"
+                               class="custom-input"
+                               placeholder="Enter password" />
+                    </div>
+
+                    <div class="input-group">
+                        <label>Phone</label>
+
+                        <input asp-for="Input.Phone"
+                               class="custom-input"
+                               placeholder="Enter phone number" />
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Year Level</label>
+
+                        <select asp-for="Input.YearLevel"
+                                class="custom-input">
+
+                            <option value="">Select Year</option>
+                            <option value="year1">Year 1</option>
+                            <option value="year2">Year 2</option>
+                            <option value="year3">Year 3</option>
+                            <option value="year4">Year 4</option>
+                            <option value="graduated">Graduated</option>
+
+                        </select>
+
+                    </div>
+
+                    <button type="submit"
+                            class="register-btn">
+
+                        Create Account
+
+                    </button>
+
+                </form>
+
+                <div class="divider">
+                    OR
+                </div>
+
+                <a asp-page="/GoogleLogin"
+                   class="google-btn">
+
+                    <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
+                         width="20" />
+
+                    Continue with Google
+
+                </a>
+
+                <div class="login-link">
+
+                    Already have an account?
+
+                    <a asp-page="/Login">
+                        Login
+                    </a>
+
+                </div>
+
+                <p class="text-danger">
+                    @Model.Message
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    }
+
+    .register-page {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+    }
+
+    .register-card {
+        width: 1100px;
+        min-height: 700px;
+        background: white;
+        border-radius: 30px;
+        overflow: hidden;
+        display: flex;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+
+    .left-side {
+        width: 45%;
+        background: linear-gradient(rgba(79,70,229,0.8), rgba(67,56,202,0.85)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .content {
+        width: 80%;
+    }
+
+        .content h1 {
+            font-size: 50px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .content p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+    .features {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .feature-box {
+        background: rgba(255,255,255,0.15);
+        padding: 18px;
+        border-radius: 14px;
+        backdrop-filter: blur(10px);
+        font-weight: 600;
+    }
+
+    .right-side {
+        width: 55%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 50px 0;
+    }
+
+    .form-container {
+        width: 75%;
+    }
+
+        .form-container h2 {
+            font-size: 38px;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+    .subtitle {
+        color: #6b7280;
+        margin-bottom: 35px;
+    }
+
+    .input-group {
+        margin-bottom: 18px;
+    }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+    .custom-input {
+        width: 100%;
+        padding: 15px;
+        border-radius: 14px;
+        border: 1px solid #d1d5db;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+        .custom-input:focus {
+            border-color: #4f46e5;
+            outline: none;
+            box-shadow: 0 0 12px rgba(79,70,229,0.2);
+        }
+
+    .register-btn {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg,#4f46e5,#4338ca);
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79,70,229,0.25);
+        }
+
+    .divider {
+        text-align: center;
+        margin: 28px 0;
+        position: relative;
+        color: #9ca3af;
+    }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+    .google-btn {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: #111827;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .google-btn:hover {
+            background: #f9fafb;
+        }
+
+    .login-link {
+        margin-top: 25px;
+        text-align: center;
+    }
+
+        .login-link a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    .text-danger {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+</style>
