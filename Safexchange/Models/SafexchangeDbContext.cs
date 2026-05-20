@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -81,8 +81,15 @@ public partial class SafexchangeDbContext : DbContext
 
     public virtual DbSet<Voucher> Vouchers { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
-
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        // Chỉ dùng khi chạy design-time tools; runtime lấy connection từ appsettings.json qua Program.cs
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(
+                "Server=localhost\\SQLEXPRESS01;Database=SafexchangeDB;Trusted_Connection=True;TrustServerCertificate=True");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

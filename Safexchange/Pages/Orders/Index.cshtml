@@ -1,0 +1,68 @@
+@page
+@model Safexchange.Pages.Orders.IndexModel
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Đơn hàng của tôi</h1>
+    <a asp-page="/Products/Index" class="btn btn-outline-primary btn-sm">Tiếp tục mua sắm</a>
+</div>
+
+@if (TempData["OrderMessage"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Orders.Any())
+{
+    <div class="alert alert-info">Bạn chưa có đơn hàng nào.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã</th>
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thanh toán</th>
+                    <th>Ngày tạo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td>#@order.OrderId</td>
+                        <td>@order.ProductTitle</td>
+                        <td class="text-end fw-semibold">@order.TotalAmount.ToString("N0") đ</td>
+                        <td><span class="badge bg-secondary">@order.OrderStatus</span></td>
+                        <td><span class="badge bg-warning text-dark">@order.PaymentStatus</span></td>
+                        <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="text-end">
+                            @if (order.CanEdit)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        onclick="OrderEdit.open(@order.OrderId)">
+                                    Chỉnh sửa
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+    <script src="~/js/order-edit.js" asp-append-version="true"></script>
+}
