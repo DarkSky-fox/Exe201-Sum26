@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "D:\\EXE201\\Safexchange\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|d:\\exe201\\safexchange\\safexchange\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|solutionrelative:safexchange\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+      "AbsoluteMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|d:\\exe201\\safexchange\\safexchange\\pages\\products\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|solutionrelative:safexchange\\pages\\products\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|d:\\exe201\\safexchange\\safexchange\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|solutionrelative:safexchange\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|d:\\exe201\\safexchange\\safexchange\\services\\icurrentuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|solutionrelative:safexchange\\services\\icurrentuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|d:\\exe201\\safexchange\\safexchange\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|solutionrelative:safexchange\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|d:\\exe201\\safexchange\\safexchange\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|solutionrelative:safexchange\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|d:\\exe201\\safexchange\\safexchange\\pages\\products\\detail.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2F96D0F8-986B-4C96-BC73-D523379F85BE}|Safexchange\\Safexchange.csproj|solutionrelative:safexchange\\pages\\products\\detail.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -27,39 +31,54 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": ".gitignore",
-              "DocumentMoniker": "D:\\EXE201\\Safexchange\\Safexchange\\.gitignore",
-              "RelativeDocumentMoniker": "Safexchange\\.gitignore",
-              "ToolTip": "D:\\EXE201\\Safexchange\\Safexchange\\.gitignore",
-              "RelativeToolTip": "Safexchange\\.gitignore",
-              "ViewState": "AQIAACIAAAAAAAAAAAAYwE4AAAAGAAAA",
-              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF8SURBVDhPjVNLTgJBEG1lwpoFB3GNK9fieA48hD8iwT/ihwgSDAIHgAGXXsEV18CNzL/LquqZdsYM6kteXqcy3fWqpmpNRBgOhyABBEgpAFVKPIMUcYzUyOU\u002BXM/b2qtU3vkSfRjjZTCAMAw1A2LwzdFoBPP5HNqdzuL27n4juibWI\u002BUshBA1DIkhEx9iEorFotgslQqGYbxxAGFEqt1MxmPWJLbLZdZ\u002Bv89q5PMFPiTR6z2zdaxR0fXA0XTBcVywkb4fwHXjRteecIDNQ7UmExVYAdPcxYaqclN46na5WenMKjtlVnTYwcXlVYaDqImW9beD5N/TeGy32QHXm6hZ03ZgiSQHp2fnWQ4oBmJqWSqwAqZpZjt4aLXAD4J0VqyZsmoubfB8H2r1eoaD6NXZ9HcHO\u002BSA3f4AjifXl8rItOETM8ckB9WTWpYD9RdeZ1PWVWAHWXPQaDb59f/w8LiqHeh1pvGkCaP6qB8yXusoxmuNZ7XmII4O9vGuEF86osuDYRkpYQAAAABJRU5ErkJggg==",
-              "WhenOpened": "2026-05-19T14:01:58.141Z",
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\EXE201\\Safexchange\\Safexchange\\Pages\\Products\\Index.cshtml",
+              "RelativeDocumentMoniker": "Safexchange\\Pages\\Products\\Index.cshtml",
+              "ToolTip": "D:\\EXE201\\Safexchange\\Safexchange\\Pages\\Products\\Index.cshtml",
+              "RelativeToolTip": "Safexchange\\Pages\\Products\\Index.cshtml",
+              "ViewState": "AQIAACcAAAAAAAAAAAAAAEMAAAAgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-20T06:31:25.602Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ICurrentUserService.cs",
+              "DocumentMoniker": "D:\\EXE201\\Safexchange\\Safexchange\\Services\\ICurrentUserService.cs",
+              "RelativeDocumentMoniker": "Safexchange\\Services\\ICurrentUserService.cs",
+              "ToolTip": "D:\\EXE201\\Safexchange\\Safexchange\\Services\\ICurrentUserService.cs",
+              "RelativeToolTip": "Safexchange\\Services\\ICurrentUserService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T06:02:23.719Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\EXE201\\Safexchange\\Safexchange\\Program.cs",
-              "RelativeDocumentMoniker": "Safexchange\\Program.cs",
-              "ToolTip": "D:\\EXE201\\Safexchange\\Safexchange\\Program.cs",
-              "RelativeToolTip": "Safexchange\\Program.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAABVAAAA",
+              "Title": "User.cs",
+              "DocumentMoniker": "D:\\EXE201\\Safexchange\\Safexchange\\Models\\User.cs",
+              "RelativeDocumentMoniker": "Safexchange\\Models\\User.cs",
+              "ToolTip": "D:\\EXE201\\Safexchange\\Safexchange\\Models\\User.cs",
+              "RelativeToolTip": "Safexchange\\Models\\User.cs",
+              "ViewState": "AQIAACYAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-19T13:52:34.448Z"
+              "WhenOpened": "2026-05-20T06:01:39.732Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\EXE201\\Safexchange\\Safexchange\\appsettings.json",
-              "RelativeDocumentMoniker": "Safexchange\\appsettings.json",
-              "ToolTip": "D:\\EXE201\\Safexchange\\Safexchange\\appsettings.json",
-              "RelativeToolTip": "Safexchange\\appsettings.json",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-05-19T13:08:46.528Z"
+              "DocumentIndex": 3,
+              "Title": "Detail.cshtml.cs",
+              "DocumentMoniker": "D:\\EXE201\\Safexchange\\Safexchange\\Pages\\Products\\Detail.cshtml.cs",
+              "RelativeDocumentMoniker": "Safexchange\\Pages\\Products\\Detail.cshtml.cs",
+              "ToolTip": "D:\\EXE201\\Safexchange\\Safexchange\\Pages\\Products\\Detail.cshtml.cs",
+              "RelativeToolTip": "Safexchange\\Pages\\Products\\Detail.cshtml.cs",
+              "ViewState": "AQIAAAEAAAAAAAAAAAAAAB4AAAAjAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T05:55:54.364Z",
+              "EditorCaption": ""
             }
           ]
         }
