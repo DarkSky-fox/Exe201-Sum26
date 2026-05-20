@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.EntityFrameworkCore;
+using Safexchange.Models;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
 using Safexchange.Services;
@@ -12,6 +14,32 @@ namespace Safexchange
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // DB Context
+            builder.Services.AddDbContext<SafexchangeDbContext>(options =>
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("ThuvienDB")));
+
+            // Authentication
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme =
+                        CookieAuthenticationDefaults.AuthenticationScheme;
+
+                    options.DefaultChallengeScheme =
+                        GoogleDefaults.AuthenticationScheme;
+                })
+                .AddCookie()
+                .AddGoogle(options =>
+                {
+                    options.ClientId =
+                        builder.Configuration["Authentication:Google:ClientId"];
+
+                    options.ClientSecret =
+                        builder.Configuration["Authentication:Google:ClientSecret"];
+                });
+
+            // Razor Pages
             builder.Services.AddRazorPages();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddDistributedMemoryCache();
@@ -29,18 +57,27 @@ namespace Safexchange
             builder.Services.AddDbContext<SafexchangeDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Session
+            builder.Services.AddSession();
+
             var app = builder.Build();
 
+            // Error Handler
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
             }
+
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseSession();
+            // Authentication phải trước Authorization
+            app.UseAuthentication();
+
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.MapRazorPages();
 
