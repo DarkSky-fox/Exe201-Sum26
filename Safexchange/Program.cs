@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
-using Microsoft.EntityFrameworkCore;
-using Safexchange.Models;
 using Safexchange.Services;
 
 namespace Safexchange
@@ -14,12 +12,16 @@ namespace Safexchange
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // DB Context
+            // =========================================
+            // DATABASE
+            // =========================================
             builder.Services.AddDbContext<SafexchangeDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("ThuvienDB")));
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Authentication
+            // =========================================
+            // AUTHENTICATION
+            // =========================================
             builder.Services
                 .AddAuthentication(options =>
                 {
@@ -29,7 +31,18 @@ namespace Safexchange
                     options.DefaultChallengeScheme =
                         GoogleDefaults.AuthenticationScheme;
                 })
-                .AddCookie()
+
+                // COOKIE LOGIN
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Login";
+
+                    options.AccessDeniedPath = "/AccessDenied";
+
+                    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                })
+
+                // GOOGLE LOGIN
                 .AddGoogle(options =>
                 {
                     options.ClientId =
@@ -39,46 +52,107 @@ namespace Safexchange
                         builder.Configuration["Authentication:Google:ClientSecret"];
                 });
 
-            // Razor Pages
+            // =========================================
+            // AUTHORIZATION
+            // =========================================
+            builder.Services.AddAuthorization();
+
+            // =========================================
+            // RAZOR PAGES
+            // =========================================
             builder.Services.AddRazorPages();
-            builder.Services.AddHttpContextAccessor();
+
+            // =========================================
+            // SESSION
+            // =========================================
             builder.Services.AddDistributedMemoryCache();
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(2);
+
                 options.Cookie.HttpOnly = true;
+
                 options.Cookie.IsEssential = true;
             });
 
+            // =========================================
+            // HTTP CONTEXT
+            // =========================================
+            builder.Services.AddHttpContextAccessor();
+
+            // =========================================
+            // CUSTOM SERVICES
+            // =========================================
             builder.Services.AddScoped<ICartService, CartService>();
+
             builder.Services.AddScoped<IOrderService, OrderService>();
+
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-
-            builder.Services.AddDbContext<SafexchangeDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            // Session
-            builder.Services.AddSession();
 
             var app = builder.Build();
 
-            // Error Handler
+            // =========================================
+            // ERROR HANDLER
+            // =========================================
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
+
+                app.UseHsts();
             }
 
+            // =========================================
+            // HTTPS
+            // =========================================
+            app.UseHttpsRedirection();
+
+            // =========================================
+            // STATIC FILES
+            // =========================================
             app.UseStaticFiles();
 
+            // =========================================
+            // ROUTING
+            // =========================================
             app.UseRouting();
 
-            // Authentication phải trước Authorization
+            // =========================================
+            // AUTHENTICATION
+            // =========================================
             app.UseAuthentication();
 
+            // =========================================
+            // AUTHORIZATION
+            // =========================================
             app.UseAuthorization();
 
+            // =========================================
+            // SESSION
+            // =========================================
             app.UseSession();
 
+            // =========================================
+            // DEFAULT ROUTE
+            // =========================================
+            app.MapGet("/", context =>
+            {
+                if (context.User.Identity != null &&
+                    context.User.Identity.IsAuthenticated)
+                {
+                    context.Response.Redirect("/Index");
+                }
+                else
+                {
+                    context.Response.Redirect("/Login");
+                }
+
+                return Task.CompletedTask;
+            });
+
+            // =========================================
+            // RAZOR PAGES
+            // =========================================
             app.MapRazorPages();
 
             app.Run();
