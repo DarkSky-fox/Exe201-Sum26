@@ -1,0 +1,54 @@
+@page
+@model Safexchange.Pages.Shipper.DeliveriesModel
+@using Safexchange.Services
+@{
+    ViewData["Title"] = "Giao hàng (Shipper)";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Quản lý giao hàng</h1>
+        <p class="text-muted small mb-0">Nhận đơn → giao hàng → xác nhận thu tiền COD (cập nhật lịch sử mua của khách).</p>
+    </div>
+    <a asp-page="/Orders/Index" class="btn btn-outline-secondary btn-sm">Lịch sử mua (demo)</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-warning">@Model.ErrorMessage</div>
+}
+else
+{
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-available" type="button">
+                Chờ nhận <span class="badge bg-secondary">@Model.Available.Count</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-active" type="button">
+                Đang giao <span class="badge bg-primary">@Model.Active.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-available">
+            @await Html.PartialAsync("_DeliveryList", Model.Available)
+        </div>
+        <div class="tab-pane fade" id="tab-active">
+            @await Html.PartialAsync("_DeliveryList", Model.Active)
+        </div>
+    </div>
+}
+
+<div id="shipper-toast" class="toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert">
+    <div class="d-flex">
+        <div class="toast-body" id="shipper-toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/shipper-deliveries.js" asp-append-version="true"></script>
+}

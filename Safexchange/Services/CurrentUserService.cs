@@ -13,10 +13,29 @@ public class CurrentUserService : ICurrentUserService
 
     private ISession Session => _httpContextAccessor.HttpContext!.Session;
 
+    public bool IsAuthenticated() =>
+        Session.GetInt32(SessionKeys.CurrentUserId).HasValue
+        && !string.IsNullOrEmpty(Session.GetString(SessionKeys.UserEmail));
+
+    public string? GetUserEmail() => Session.GetString(SessionKeys.UserEmail);
+
+    public void SignIn(int userId, string email, string role)
+    {
+        Session.Clear();
+        Session.SetInt32(SessionKeys.CurrentUserId, userId);
+        Session.SetString(SessionKeys.UserEmail, email);
+        Session.SetString(SessionKeys.UserRole, role);
+    }
+
+    public void SignOut()
+    {
+        Session.Clear();
+    }
+
     public int GetUserId()
     {
         var stored = Session.GetInt32(SessionKeys.CurrentUserId);
-        if (stored.HasValue)
+        if (stored.HasValue && IsAuthenticated())
         {
             return stored.Value;
         }

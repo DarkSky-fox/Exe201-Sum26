@@ -5,7 +5,7 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Đơn hàng của tôi</h1>
+    <h1 class="h3 mb-0">Lịch sử mua hàng</h1>
     <a asp-page="/Products/Index" class="btn btn-outline-primary btn-sm">Tiếp tục mua sắm</a>
 </div>
 
@@ -30,9 +30,10 @@ else
                     <th>Mã</th>
                     <th>Sản phẩm</th>
                     <th class="text-end">Tổng tiền</th>
-                    <th>Trạng thái</th>
+                    <th>Trạng thái đơn</th>
+                    <th>Giao hàng</th>
                     <th>Thanh toán</th>
-                    <th>Ngày tạo</th>
+                    <th>Ngày</th>
                     <th></th>
                 </tr>
             </thead>
@@ -43,9 +44,29 @@ else
                         <td>#@order.OrderId</td>
                         <td>@order.ProductTitle</td>
                         <td class="text-end fw-semibold">@order.TotalAmount.ToString("N0") đ</td>
-                        <td><span class="badge bg-secondary">@order.OrderStatus</span></td>
-                        <td><span class="badge bg-warning text-dark">@order.PaymentStatus</span></td>
-                        <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <span class="badge bg-secondary">@order.OrderStatusDisplay</span>
+                        </td>
+                        <td>
+                            @if (order.ShipmentStatusDisplay is not null)
+                            {
+                                <span class="badge bg-info text-dark">@order.ShipmentStatusDisplay</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge @order.PaymentBadgeClass">@order.PaymentStatusDisplay</span>
+                        </td>
+                        <td class="small">
+                            <div>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                            @if (order.CompletedAt.HasValue)
+                            {
+                                <div class="text-muted">Hoàn tất: @order.CompletedAt.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                            }
+                        </td>
                         <td class="text-end">
                             @if (order.CanEdit)
                             {
