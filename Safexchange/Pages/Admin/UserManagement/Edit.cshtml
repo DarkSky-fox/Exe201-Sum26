@@ -1,0 +1,110 @@
+﻿@page
+@model Safexchange.Pages.Admin.UserManagement.EditModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa người dùng";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid px-4 mt-4">
+    <!-- Breadcrumb điều hướng -->
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a asp-page="./Index">Quản lý người dùng</a></li>
+        <li class="breadcrumb-item active">Chỉnh sửa tài khoản</li>
+    </ol>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+            <h5 class="card-title mb-0"><i class="fas fa-user-edit me-2"></i>Cập nhật thông tin thành viên</h5>
+            <span class="badge bg-light text-dark">ID: @Model.User.UserId</span>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <input type="hidden" asp-for="User.UserId" />
+                <input type="hidden" asp-for="User.PasswordHash" /> @* Giữ ẩn password hash để tránh mất dữ liệu *@
+
+                <div class="row g-3">
+                    <!-- Họ và tên -->
+                    <div class="col-md-6">
+                        <label asp-for="User.FullName" class="form-label fw-bold">Họ và tên</label>
+                        <input asp-for="User.FullName" class="form-control" placeholder="Nhập đầy đủ họ tên" />
+                        <span asp-validation-for="User.FullName" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="col-md-6">
+                        <label asp-for="User.Phone" class="form-label fw-bold">Số điện thoại</label>
+                        <input asp-for="User.Phone" class="form-control" placeholder="Ví dụ: 0912345678" />
+                        <span asp-validation-for="User.Phone" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Email công khai -->
+                    <div class="col-md-6">
+                        <label asp-for="User.Email" class="form-label fw-bold">Địa chỉ Email</label>
+                        <input asp-for="User.Email" class="form-control" type="email" placeholder="name@school.edu.vn" />
+                        <span asp-validation-for="User.Email" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Vai trò (Dropdown dựa trên DB CHECK) -->
+                    <div class="col-md-6">
+                        <label asp-for="User.Role" class="form-label fw-bold">Vai trò hệ thống</label>
+                        <select asp-for="User.Role" class="form-select">
+                            <option value="student">Sinh viên (Student)</option>
+                            <option value="shipper">Người giao hàng (Shipper)</option>
+                            <option value="admin">Quản trị viên (Admin)</option>
+                        </select>
+                        <span asp-validation-for="User.Role" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Năm học (Dropdown dựa trên DB CHECK) -->
+                    <div class="col-md-6">
+                        <label asp-for="User.YearLevel" class="form-label fw-bold">Năm học / Trình độ</label>
+                        <select asp-for="User.YearLevel" class="form-select">
+                            <option value="">-- Chưa cập nhật --</option>
+                            <option value="year1">Sinh viên năm 1</option>
+                            <option value="year2">Sinh viên năm 2</option>
+                            <option value="year3">Sinh viên năm 3</option>
+                            <option value="year4">Sinh viên năm 4</option>
+                            <option value="graduated">Đã tốt nghiệp</option>
+                        </select>
+                        <span asp-validation-for="User.YearLevel" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Trạng thái tài khoản (Dropdown dựa trên DB CHECK) -->
+                    <div class="col-md-6">
+                        <label asp-for="User.AccountStatus" class="form-label fw-bold">Trạng thái tài khoản</label>
+                        <select asp-for="User.AccountStatus" class="form-select">
+                            <option value="active">Đang hoạt động (Active)</option>
+                            <option value="suspended">Tạm khóa (Suspended)</option>
+                            <option value="deleted">Đã xóa (Deleted)</option>
+                        </select>
+                        <span asp-validation-for="User.AccountStatus" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Ngày tạo (Chỉ hiển thị, không cho sửa) -->
+                    <div class="col-md-6">
+                        <label asp-for="User.CreatedAt" class="form-label fw-bold">Ngày tham gia</label>
+                        <input asp-for="User.CreatedAt" class="form-control bg-light" readonly />
+                    </div>
+                </div>
+
+                <!-- Thanh công cụ xử lý -->
+                <div class="mt-4 pt-3 border-top d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-1"></i> Lưu thay đổi
+                    </button>
+                    <a asp-page="./Index" class="btn btn-outline-secondary px-4">
+                        Quay lại danh sách
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
