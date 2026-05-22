@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
-using Microsoft.EntityFrameworkCore;
-using Safexchange.Models;
 using Safexchange.Services;
 
 namespace Safexchange
@@ -17,7 +15,7 @@ namespace Safexchange
             // DB Context
             builder.Services.AddDbContext<SafexchangeDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("ThuvienDB")));
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Authentication
             builder.Services
