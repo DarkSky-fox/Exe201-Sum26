@@ -117,6 +117,7 @@ namespace Safexchange
             // =========================================
             app.UseRouting();
 
+            app.UseHttpsRedirection();
             // =========================================
             // AUTHENTICATION
             // =========================================
@@ -135,20 +136,7 @@ namespace Safexchange
             // =========================================
             // DEFAULT ROUTE
             // =========================================
-            app.MapGet("/", context =>
-            {
-                if (context.User.Identity != null &&
-                    context.User.Identity.IsAuthenticated)
-                {
-                    context.Response.Redirect("/Index");
-                }
-                else
-                {
-                    context.Response.Redirect("/Login");
-                }
-
-                return Task.CompletedTask;
-            });
+           
 
             // =========================================
             // RAZOR PAGES
