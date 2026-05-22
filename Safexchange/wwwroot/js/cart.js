@@ -17,7 +17,45 @@ const Cart = (function () {
             })
             .then(html => {
                 document.getElementById(targetId).innerHTML = html;
+                bindCartSelection();
             });
+    }
+
+    function getSelectedCheckboxes() {
+        return Array.from(document.querySelectorAll('.cart-item-select:checked'));
+    }
+
+    function bindCartSelection() {
+        const boxes = document.querySelectorAll('.cart-item-select');
+        boxes.forEach(box => {
+            box.addEventListener('change', updateSelectedSummary);
+        });
+        const selectAll = document.getElementById('cart-select-all');
+        if (selectAll) {
+            selectAll.addEventListener('change', () => toggleSelectAll(selectAll.checked));
+        }
+        updateSelectedSummary();
+    }
+
+    function toggleSelectAll(checked) {
+        document.querySelectorAll('.cart-item-select').forEach(box => {
+            box.checked = checked;
+        });
+        const selectAll = document.getElementById('cart-select-all');
+        if (selectAll) selectAll.checked = checked;
+        updateSelectedSummary();
+    }
+
+    function updateSelectedSummary() {
+        const selected = getSelectedCheckboxes();
+        const countEl = document.getElementById('cart-selected-count');
+        const totalEl = document.getElementById('cart-selected-total');
+        let total = 0;
+        selected.forEach(box => {
+            total += parseFloat(box.dataset.price) || 0;
+        });
+        if (countEl) countEl.textContent = selected.length;
+        if (totalEl) totalEl.textContent = total.toLocaleString('vi-VN');
     }
 
     function refreshBadge() {
@@ -94,23 +132,56 @@ const Cart = (function () {
             });
     }
 
-    function checkout() {
-        fetch(`${baseUrl}?handler=Checkout`, { method: 'POST' })
+    function goToCheckout() {
+        const selected = getSelectedCheckboxes();
+        if (selected.length === 0) {
+            alert('Chọn ít nhất một sản phẩm để thanh toán.');
+            return;
+        }
+
+        const body = new URLSearchParams();
+        selected.forEach(box => body.append('productIds', box.value));
+
+        fetch(`${baseUrl}?handler=PrepareCheckout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
             .then(r => r.json())
             .then(data => {
                 if (!data.success) {
-                    alert(data.message || 'Đặt hàng thất bại.');
+                    if (data.redirectUrl && data.redirectUrl.includes('Login')) {
+                        window.location.href = '/Login';
+                        return;
+                    }
+                    alert(data.message || 'Không thể chuyển sang thanh toán.');
                     return;
                 }
                 getViewModal().hide();
-                refreshBadge();
-                if (data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
-                } else {
-                    alert(data.message);
-                }
-            });
+                window.location.href = data.redirectUrl;
+            })
+            .catch(() => alert('Không thể chuyển sang thanh toán. Vui lòng đăng nhập.'));
     }
 
-    return { openView, openEdit, saveEdit, removeItem, checkout, refreshBadge };
+    function prepareCheckout(productIds) {
+        const body = new URLSearchParams();
+        productIds.forEach(id => body.append('productIds', id));
+
+        return fetch(`${baseUrl}?handler=PrepareCheckout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        }).then(r => r.json());
+    }
+
+    return {
+        openView,
+        openEdit,
+        saveEdit,
+        removeItem,
+        goToCheckout,
+        prepareCheckout,
+        toggleSelectAll,
+        refreshBadge
+    };
 })();

@@ -8,14 +8,10 @@ namespace Safexchange.Pages.Cart;
 public class IndexModel : PageModel
 {
     private readonly ICartService _cart;
-    private readonly IOrderService _orderService;
-    private readonly ICurrentUserService _currentUser;
 
-    public IndexModel(ICartService cart, IOrderService orderService, ICurrentUserService currentUser)
+    public IndexModel(ICartService cart)
     {
         _cart = cart;
-        _orderService = orderService;
-        _currentUser = currentUser;
     }
 
     public IReadOnlyList<CartItem> Items => _cart.GetItems();
@@ -48,30 +44,30 @@ public class IndexModel : PageModel
         return new JsonResult(new { success = true, count = _cart.GetItemCount(), total = _cart.GetTotal() });
     }
 
-    public async Task<IActionResult> OnPostCheckoutAsync(CancellationToken cancellationToken)
+    public IActionResult OnPostPrepareCheckout([FromForm] int[] productIds)
     {
-        var items = _cart.GetItems();
+        if (!User.Identity?.IsAuthenticated == true)
+        {
+            return new JsonResult(new { success = false, message = "Vui lòng đăng nhập.", redirectUrl = "/Login" });
+        }
+
+        if (productIds is null || productIds.Length == 0)
+        {
+            return new JsonResult(new { success = false, message = "Chọn ít nhất một sản phẩm để thanh toán." });
+        }
+
+        var items = _cart.GetItems(productIds);
         if (items.Count == 0)
         {
-            return new JsonResult(new { success = false, message = "Giỏ hàng trống." });
+            return new JsonResult(new { success = false, message = "Sản phẩm đã chọn không còn trong giỏ hàng." });
         }
 
-        var buyerId = _currentUser.GetUserId();
-        var orders = await _orderService.CreateOrdersFromCartAsync(buyerId, items, cancellationToken);
-
-        if (orders.Count == 0)
-        {
-            return new JsonResult(new { success = false, message = "Không thể tạo đơn hàng. Kiểm tra lại sản phẩm." });
-        }
-
-        _cart.Clear();
+        _cart.SetCheckoutProductIds(productIds);
 
         return new JsonResult(new
         {
             success = true,
-            message = $"Đã tạo {orders.Count} đơn hàng thành công.",
-            orderIds = orders.Select(o => o.OrderId).ToList(),
-            redirectUrl = Url.Page("/Orders/Index")
+            redirectUrl = Url.Page("/Checkout/Index")
         });
     }
 }

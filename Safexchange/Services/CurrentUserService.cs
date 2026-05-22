@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 namespace Safexchange.Services;
 
 public class CurrentUserService : ICurrentUserService
@@ -13,8 +15,19 @@ public class CurrentUserService : ICurrentUserService
 
     private ISession Session => _httpContextAccessor.HttpContext!.Session;
 
+    private HttpContext HttpContext => _httpContextAccessor.HttpContext!;
+
     public int GetUserId()
     {
+        var claimId = HttpContext.User?.FindFirst("UserId")?.Value
+            ?? HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (int.TryParse(claimId, out var fromClaim))
+        {
+            Session.SetInt32(SessionKeys.CurrentUserId, fromClaim);
+            return fromClaim;
+        }
+
         var stored = Session.GetInt32(SessionKeys.CurrentUserId);
         if (stored.HasValue)
         {

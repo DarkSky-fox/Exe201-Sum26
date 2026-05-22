@@ -20,11 +20,9 @@ public class IndexModel : PageModel
         _currentUser = currentUser;
     }
 
-    public IList<OrderListItem> Orders { get; private set; }
-        = new List<OrderListItem>();
+    public IList<OrderListItem> Orders { get; private set; } = new List<OrderListItem>();
 
-    public async Task OnGetAsync(
-        CancellationToken cancellationToken)
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var buyerId = _currentUser.GetUserId();
 
@@ -32,27 +30,26 @@ public class IndexModel : PageModel
             .AsNoTracking()
             .Where(o => o.BuyerId == buyerId)
             .Include(o => o.Product)
+            .Include(o => o.Shipment!)
+                .ThenInclude(s => s.ShipStatus)
+            .Include(o => o.Shipment!)
+                .ThenInclude(s => s.DeliveryAddress)
+            .Include(o => o.Payments)
             .OrderByDescending(o => o.CreatedAt)
             .Select(o => new OrderListItem
             {
                 OrderId = o.OrderId,
-
                 ProductTitle = o.Product.Title,
-
-                ItemPrice = o.ItemPrice,
-
-                PlatformFee = o.PlatformFee,
-
-                ShippingFee = o.ShippingFee,
-
-                DiscountAmount = o.DiscountAmount,
-
                 TotalAmount = o.TotalAmount,
-
                 OrderStatus = o.OrderStatus,
-
                 PaymentStatus = o.PaymentStatus,
-
+                PaymentMethod = o.Payments
+                    .OrderByDescending(p => p.PaymentId)
+                    .Select(p => p.PaymentMethod)
+                    .FirstOrDefault() ?? "cash",
+                ShipStatusCode = o.Shipment != null ? o.Shipment.ShipStatus.StatusCode : null,
+                ShipStatusName = o.Shipment != null ? o.Shipment.ShipStatus.StatusName : null,
+                DeliveryAddress = o.Shipment != null ? o.Shipment.DeliveryAddress.AddressLine : null,
                 CreatedAt = o.CreatedAt
             })
             .ToListAsync(cancellationToken);
@@ -62,31 +59,22 @@ public class IndexModel : PageModel
     {
         public int OrderId { get; set; }
 
-        public string ProductTitle { get; set; }
-            = string.Empty;
-
-        public decimal ItemPrice { get; set; }
-
-        public decimal PlatformFee { get; set; }
-
-        public decimal ShippingFee { get; set; }
-
-        public decimal DiscountAmount { get; set; }
+        public string ProductTitle { get; set; } = string.Empty;
 
         public decimal TotalAmount { get; set; }
 
-        public string OrderStatus { get; set; }
-            = string.Empty;
+        public string OrderStatus { get; set; } = string.Empty;
 
-        public string PaymentStatus { get; set; }
-            = string.Empty;
+        public string PaymentStatus { get; set; } = string.Empty;
+
+        public string PaymentMethod { get; set; } = "cash";
+
+        public string? ShipStatusCode { get; set; }
+
+        public string? ShipStatusName { get; set; }
+
+        public string? DeliveryAddress { get; set; }
 
         public DateTime CreatedAt { get; set; }
-
-        public bool CanEdit =>
-            string.Equals(
-                OrderStatus,
-                "pending",
-                StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -20,9 +20,18 @@ public class CartService : ICartService
 
     public IReadOnlyList<CartItem> GetItems() => LoadCart();
 
+    public IReadOnlyList<CartItem> GetItems(IEnumerable<int> productIds)
+    {
+        var idSet = productIds.ToHashSet();
+        return LoadCart().Where(i => idSet.Contains(i.ProductId)).ToList();
+    }
+
     public int GetItemCount() => LoadCart().Sum(i => i.Quantity);
 
     public decimal GetTotal() => LoadCart().Sum(i => i.LineTotal);
+
+    public decimal GetSelectedTotal(IEnumerable<int> productIds)
+        => GetItems(productIds).Sum(i => i.LineTotal);
 
     public void AddItem(CartItem item)
     {
@@ -68,9 +77,39 @@ public class CartService : ICartService
         SaveCart(cart);
     }
 
+    public void RemoveItems(IEnumerable<int> productIds)
+    {
+        var idSet = productIds.ToHashSet();
+        var cart = LoadCart();
+        cart.RemoveAll(i => idSet.Contains(i.ProductId));
+        SaveCart(cart);
+    }
+
     public void Clear()
     {
         Session.Remove(SessionKeys.Cart);
+    }
+
+    public void SetCheckoutProductIds(IEnumerable<int> productIds)
+    {
+        var ids = productIds.Distinct().ToList();
+        Session.SetString(SessionKeys.CheckoutProductIds, JsonSerializer.Serialize(ids, JsonOptions));
+    }
+
+    public IReadOnlyList<int> GetCheckoutProductIds()
+    {
+        var json = Session.GetString(SessionKeys.CheckoutProductIds);
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return Array.Empty<int>();
+        }
+
+        return JsonSerializer.Deserialize<List<int>>(json, JsonOptions) ?? new List<int>();
+    }
+
+    public void ClearCheckoutProductIds()
+    {
+        Session.Remove(SessionKeys.CheckoutProductIds);
     }
 
     private List<CartItem> LoadCart()

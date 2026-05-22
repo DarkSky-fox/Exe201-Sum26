@@ -56,10 +56,18 @@ const ProductActions = (function () {
     }
 
     function handleResponse(data) {
+        if (!data.success && data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+            return;
+        }
         if (data.cartCount !== undefined && typeof Cart !== 'undefined') {
             Cart.refreshBadge();
         }
         showToast(data.message || 'Hoàn tất.', !data.success);
+        if (data.success && data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+            return;
+        }
         if (data.success && data.openCart && typeof Cart !== 'undefined') {
             setTimeout(() => Cart.openView(), 400);
         }

@@ -1,0 +1,89 @@
+@page
+@model Safexchange.Pages.Shipper.IndexModel
+@using Safexchange.Services
+@{
+    ViewData["Title"] = "Quản lý giao hàng";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Đơn giao hàng</h1>
+        <p class="text-muted mb-0">Nhận đơn → Giao hàng → Xác nhận thu tiền COD</p>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @(Model.IsError ? "alert-danger" : "alert-success") alert-dismissible fade show">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Orders.Any())
+{
+    <div class="alert alert-info">Hiện không có đơn cần giao.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var order in Model.Orders)
+        {
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                            <div>
+                                <span class="fw-bold">#@order.OrderId</span>
+                                <span class="text-muted ms-2">@order.ProductTitle</span>
+                            </div>
+                            <span class="badge bg-primary">@OrderDisplayHelper.ShipStatusLabel(order.ShipStatusCode, order.ShipStatusName)</span>
+                        </div>
+
+                        <div class="row small text-muted mb-3">
+                            <div class="col-md-6">
+                                <div><strong>Khách:</strong> @order.BuyerName</div>
+                                <div><strong>SĐT:</strong> @order.DeliveryPhone</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div><strong>Địa chỉ:</strong> @order.DeliveryAddress</div>
+                                <div><strong>Thu COD:</strong> <span class="text-danger fw-semibold">@order.TotalAmount.ToString("N0") đ</span></div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (order.CanTakeOrder)
+                            {
+                                <form method="post" asp-page-handler="Take">
+                                    <input type="hidden" name="shipmentId" value="@order.ShipmentId" />
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Nhận đơn</button>
+                                </form>
+                            }
+                            @if (order.CanStartDelivery)
+                            {
+                                <form method="post" asp-page-handler="Advance">
+                                    <input type="hidden" name="shipmentId" value="@order.ShipmentId" />
+                                    <button type="submit" class="btn btn-info btn-sm text-dark">Bắt đầu giao</button>
+                                </form>
+                            }
+                            @if (order.CanMarkDelivered)
+                            {
+                                <form method="post" asp-page-handler="Advance">
+                                    <input type="hidden" name="shipmentId" value="@order.ShipmentId" />
+                                    <button type="submit" class="btn btn-warning btn-sm text-dark">Đã giao hàng</button>
+                                </form>
+                            }
+                            @if (order.CanConfirmCod)
+                            {
+                                <form method="post" asp-page-handler="ConfirmCod" onsubmit="return confirm('Xác nhận đã nhận tiền COD từ khách?');">
+                                    <input type="hidden" name="shipmentId" value="@order.ShipmentId" />
+                                    <button type="submit" class="btn btn-success btn-sm">Xác nhận đã thu tiền</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

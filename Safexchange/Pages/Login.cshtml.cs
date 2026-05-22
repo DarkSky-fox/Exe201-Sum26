@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Safexchange.Models;
+using Safexchange.Services;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,10 +13,12 @@ namespace Safexchange.Pages
     public class LoginModel : PageModel
     {
         private readonly SafexchangeDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public LoginModel(SafexchangeDbContext context)
+        public LoginModel(SafexchangeDbContext context, ICurrentUserService currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         [BindProperty]
@@ -64,7 +67,13 @@ namespace Safexchange.Pages
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal);
 
-            // REDIRECT
+            _currentUser.SetUserId(user.UserId);
+
+            if (string.Equals(user.Role, "shipper", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToPage("/Shipper/Index");
+            }
+
             return RedirectToPage("/Index");
         }
 

@@ -63,13 +63,25 @@ public class DetailModel : PageModel
 
     public async Task<IActionResult> OnPostBuyNowAsync(int id, int quantity = 1)
     {
+        if (!User.Identity?.IsAuthenticated == true)
+        {
+            return new JsonResult(new { success = false, message = "Vui lòng đăng nhập để mua hàng.", redirectUrl = "/Login" });
+        }
+
         var (success, message) = await TryAddToCartAsync(id, quantity);
+        if (!success)
+        {
+            return new JsonResult(new { success, message, cartCount = _cart.GetItemCount() });
+        }
+
+        _cart.SetCheckoutProductIds(new[] { id });
+
         return new JsonResult(new
         {
-            success,
-            message = success ? "Đã thêm vào giỏ. Mở giỏ hàng để thanh toán." : message,
+            success = true,
+            message = "Chuyển đến trang thanh toán...",
             cartCount = _cart.GetItemCount(),
-            openCart = success
+            redirectUrl = Url.Page("/Checkout/Index")
         });
     }
 
