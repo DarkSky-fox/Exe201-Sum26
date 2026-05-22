@@ -29,13 +29,81 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/Orders/Index">Đơn hàng</a>
                         </li>
                     </ul>
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav d-flex align-items-center gap-2">
+
+                        <!-- CART -->
                         <li class="nav-item">
-                            <button type="button" class="btn btn-outline-primary btn-sm position-relative" onclick="Cart.openView()">
+
+                            <button type="button"
+                                    class="btn btn-outline-primary btn-sm position-relative"
+                                    onclick="Cart.openView()">
+
                                 Giỏ hàng
-                                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
+
+                                <span id="cart-badge"
+                                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                      style="display:none;">
+
+                                    0
+
+                                </span>
+
                             </button>
+
                         </li>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <!-- USER -->
+                            <li class="nav-item d-flex align-items-center">
+
+                                <span class="fw-bold text-dark">
+
+                                    Hello, @User.Identity.Name
+
+                                </span>
+
+                            </li>
+
+                            <!-- LOGOUT -->
+                            <li class="nav-item">
+
+                                <a href="/Logout"
+                                   class="btn btn-danger btn-sm">
+
+                                    Logout
+
+                                </a>
+
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- LOGIN -->
+                            <li class="nav-item">
+
+                                <a href="/Login"
+                                   class="btn btn-primary btn-sm">
+
+                                    Login
+
+                                </a>
+
+                            </li>
+
+                            <!-- REGISTER -->
+                            <li class="nav-item">
+
+                                <a href="/Register"
+                                   class="btn btn-outline-success btn-sm">
+
+                                    Register
+
+                                </a>
+
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>
