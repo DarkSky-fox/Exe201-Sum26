@@ -94,10 +94,23 @@ const Cart = (function () {
             });
     }
 
-    function goToCheckout() {
-        getViewModal().hide();
-        window.location.href = '/Checkout';
+    function checkout() {
+        fetch(`${baseUrl}?handler=Checkout`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.message || 'Đặt hàng thất bại.');
+                    return;
+                }
+                getViewModal().hide();
+                refreshBadge();
+                if (data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    alert(data.message);
+                }
+            });
     }
 
-    return { openView, openEdit, saveEdit, removeItem, goToCheckout, refreshBadge };
+    return { openView, openEdit, saveEdit, removeItem, checkout, refreshBadge };
 })();

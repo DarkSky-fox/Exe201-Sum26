@@ -17,7 +17,7 @@ namespace Safexchange
             // DB Context
             builder.Services.AddDbContext<SafexchangeDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")));
+                    builder.Configuration.GetConnectionString("ThuvienDB")));
 
             // Authentication
             builder.Services
@@ -52,7 +52,6 @@ namespace Safexchange
 
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
-            builder.Services.AddScoped<IShipmentService, ShipmentService>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             builder.Services.AddDbContext<SafexchangeDbContext>(options =>

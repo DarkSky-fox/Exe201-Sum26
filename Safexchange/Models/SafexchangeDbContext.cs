@@ -87,7 +87,7 @@ public partial class SafexchangeDbContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseSqlServer(
-                "Server=DESKTOP-9CCGUJS\\SQLEXPRESS01;Database=SafexchangeDB;Trusted_Connection=True;TrustServerCertificate=True");
+                "Server=localhost\\SQLEXPRESS01;Database=SafexchangeDB;Trusted_Connection=True;TrustServerCertificate=True");
         }
     }
 

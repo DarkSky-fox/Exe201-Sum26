@@ -59,10 +59,6 @@ const ProductActions = (function () {
         if (data.cartCount !== undefined && typeof Cart !== 'undefined') {
             Cart.refreshBadge();
         }
-        if (data.success && data.redirectUrl) {
-            window.location.href = data.redirectUrl;
-            return;
-        }
         showToast(data.message || 'Hoàn tất.', !data.success);
         if (data.success && data.openCart && typeof Cart !== 'undefined') {
             setTimeout(() => Cart.openView(), 400);

@@ -42,10 +42,3 @@ body {
   transform: translateY(-2px);
   transition: transform 0.15s ease;
 }
-
-@media (min-width: 992px) {
-  .checkout-summary-sticky {
-    position: sticky;
-    top: 1rem;
-  }
-}

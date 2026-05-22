@@ -1,21 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Safexchange.Models;
-using Safexchange.Services;
-using System.Security.Cryptography;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Safexchange.Pages
 {
     public class LoginModel : PageModel
     {
         private readonly SafexchangeDbContext _context;
-        private readonly ICurrentUserService _currentUser;
 
-        public LoginModel(SafexchangeDbContext context, ICurrentUserService currentUser)
+        public LoginModel(SafexchangeDbContext context)
         {
             _context = context;
-            _currentUser = currentUser;
         }
 
         [BindProperty]
@@ -40,7 +37,9 @@ namespace Safexchange.Pages
                 return Page();
             }
 
-            _currentUser.SignIn(user.UserId, user.Email, user.Role);
+            HttpContext.Session.SetString("UserEmail", user.Email);
+
+            HttpContext.Session.SetString("Role", user.Role);
 
             return RedirectToPage("/Index");
         }

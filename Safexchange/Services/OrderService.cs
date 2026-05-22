@@ -6,12 +6,10 @@ namespace Safexchange.Services;
 public class OrderService : IOrderService
 {
     private readonly SafexchangeDbContext _db;
-    private readonly IShipmentService _shipmentService;
 
-    public OrderService(SafexchangeDbContext db, IShipmentService shipmentService)
+    public OrderService(SafexchangeDbContext db)
     {
         _db = db;
-        _shipmentService = shipmentService;
     }
 
     public async Task<decimal> CalculatePlatformFeeAsync(decimal itemPrice, CancellationToken cancellationToken = default)
@@ -102,11 +100,6 @@ public class OrderService : IOrderService
         if (created.Count > 0)
         {
             await _db.SaveChangesAsync(cancellationToken);
-
-            foreach (var order in created)
-            {
-                await _shipmentService.TryCreateShipmentForOrderAsync(order.OrderId, cancellationToken);
-            }
         }
 
         return created;
