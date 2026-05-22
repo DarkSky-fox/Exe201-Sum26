@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Safexchange.Models;
-using System.Text;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Safexchange.Pages
 {
@@ -23,10 +26,12 @@ namespace Safexchange.Pages
 
         public string Message { get; set; }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
+            // HASH PASSWORD
             string hashedPassword = HashPassword(Password);
 
+            // CHECK USER
             var user = _context.Users.FirstOrDefault(x =>
                 x.Email == Email &&
                 x.PasswordHash == hashedPassword);
@@ -37,13 +42,33 @@ namespace Safexchange.Pages
                 return Page();
             }
 
-            HttpContext.Session.SetString("UserEmail", user.Email);
+            // CLAIMS
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("UserId", user.UserId.ToString())
+            };
 
-            HttpContext.Session.SetString("Role", user.Role);
+            // IDENTITY
+            var identity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
 
+            // PRINCIPAL
+            var principal = new ClaimsPrincipal(identity);
+
+            // SIGN IN
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal);
+
+            // REDIRECT
             return RedirectToPage("/Index");
         }
 
+        // HASH PASSWORD
         private string HashPassword(string password)
         {
             using (SHA256 sha256 = SHA256.Create())
