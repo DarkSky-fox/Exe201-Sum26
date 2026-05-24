@@ -32,13 +32,24 @@ public class CreateModel : PageModel
     public SelectList CategoryList { get; private set; } = null!;
     public SelectList StatusList { get; private set; } = null!;
 
-    public async Task OnGetAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
+        if (!await _currentUser.IsUserVerifiedAsync())
+        {
+            return RedirectToPage("/Seller/Index");
+        }
+
         await LoadSelectListsAsync(cancellationToken);
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
+        if (!await _currentUser.IsUserVerifiedAsync())
+        {
+            return RedirectToPage("/Seller/Index");
+        }
+
         await LoadSelectListsAsync(cancellationToken);
 
         if (!ModelState.IsValid)
