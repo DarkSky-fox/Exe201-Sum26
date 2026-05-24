@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using Safexchange.Models;
 
 namespace Safexchange.Services;
 
@@ -6,11 +8,13 @@ public class CurrentUserService : ICurrentUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConfiguration _configuration;
+    private readonly SafexchangeDbContext _db;
 
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+    public CurrentUserService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, SafexchangeDbContext db)
     {
         _httpContextAccessor = httpContextAccessor;
         _configuration = configuration;
+        _db = db;
     }
 
     private ISession Session => _httpContextAccessor.HttpContext!.Session;
@@ -42,5 +46,12 @@ public class CurrentUserService : ICurrentUserService
     public void SetUserId(int userId)
     {
         Session.SetInt32(SessionKeys.CurrentUserId, userId);
+    }
+
+    public async Task<bool> IsUserVerifiedAsync()
+    {
+        var userId = GetUserId();
+        return await _db.UserVerifications
+            .AnyAsync(v => v.UserId == userId && v.Status == "Approved");
     }
 }
