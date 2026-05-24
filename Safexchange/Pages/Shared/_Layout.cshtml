@@ -26,8 +26,14 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/Products/Index">Sản phẩm</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Orders/Index">Đơn hàng</a>
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Orders/Index">Lịch sử mua hàng</a>
                         </li>
+                        @if (User.IsInRole("shipper"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Shipper/Index">Giao hàng</a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav d-flex align-items-center gap-2">
 
@@ -52,14 +58,14 @@
 
                         </li>
 
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             <!-- USER -->
                             <li class="nav-item d-flex align-items-center">
 
                                 <span class="fw-bold text-dark">
 
-                                    Hello, @User.Identity.Name
+                                    Hello, @User.Identity?.Name
 
                                 </span>
 
