@@ -1,12 +1,761 @@
 @page
-@model IndexModel
+@model Safexchange.Pages.IndexModel
 @{
-    ViewData["Title"] = "Trang chủ";
+    ViewData["Title"] = "Trang Chủ";
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5 mb-3">Chào mừng đến Safexchange</h1>
-    <p class="lead text-muted mb-4">Nền tảng mua bán đồ dùng cũ trong trường học</p>
-    <a asp-page="/Products/Index" class="btn btn-primary btn-lg me-2">Xem sản phẩm</a>
-    <button type="button" class="btn btn-outline-primary btn-lg" onclick="Cart.openView()">Giỏ hàng</button>
-</div>
+<!-- HERO SECTION -->
+<section class="hero-section text-white d-flex align-items-center">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+
+                <h1 class="display-4 fw-bold mb-4">
+                    Student Marketplace For Used Goods
+                </h1>
+
+                <p class="lead mb-4">
+                    Buy and sell second-hand items safely for students.
+                    Save money, reduce waste, and help other students.
+                </p>
+
+                <div class="d-flex gap-3">
+
+                    <a asp-page="/Products/Index"
+                       class="btn btn-light btn-lg px-4">
+
+                        Shop Now
+
+                    </a>
+
+                    <a asp-page="/Register"
+                       class="btn btn-outline-light btn-lg px-4">
+
+                        Start Selling
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6 text-center">
+
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
+                     class="img-fluid hero-img"
+                     alt="students">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- SEARCH -->
+<section class="search-section py-4 bg-white shadow-sm">
+
+    <div class="container">
+
+        <form method="get"
+              asp-page="/Products/Index">
+
+            <div class="input-group input-group-lg">
+
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search laptop, desk, chair, books..." />
+
+                <button class="btn btn-primary">
+
+                    <i class="bi bi-search"></i>
+                    Search
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- CATEGORIES -->
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h2 class="fw-bold">
+                Danh mục sản phẩm
+            </h2>
+
+            <a asp-page="/Products/Index"
+               class="text-decoration-none">
+
+                Xem tất cả
+
+            </a>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- ĐỒ ĐIỆN TỬ -->
+            <div class="col-lg-2 col-md-4 col-6">
+
+                <a asp-page="/Products/Index"
+                   asp-route-category="Đồ điện tử"
+                   class="text-decoration-none">
+
+                    <div class="category-card">
+
+                        <i class="bi bi-laptop"></i>
+
+                        <h6>Đồ điện tử</h6>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <!-- ĐỒ HỌC TẬP -->
+            <div class="col-lg-2 col-md-4 col-6">
+
+                <a asp-page="/Products/Index"
+                   asp-route-category="Đồ học tập"
+                   class="text-decoration-none">
+
+                    <div class="category-card">
+
+                        <i class="bi bi-pencil-square"></i>
+
+                        <h6>Đồ học tập</h6>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <!-- SÁCH -->
+            <div class="col-lg-2 col-md-4 col-6">
+
+                <a asp-page="/Products/Index"
+                   asp-route-category="Sách/Giáo trình"
+                   class="text-decoration-none">
+
+                    <div class="category-card">
+
+                        <i class="bi bi-book"></i>
+
+                        <h6>Sách/Giáo trình</h6>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <!-- ĐỒ PHÒNG TRỌ -->
+            <div class="col-lg-2 col-md-4 col-6">
+
+                <a asp-page="/Products/Index"
+                   asp-route-category="Đồ phòng trọ"
+                   class="text-decoration-none">
+
+                    <div class="category-card">
+
+                        <i class="bi bi-house-door"></i>
+
+                        <h6>Đồ phòng trọ</h6>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <!-- COMBO -->
+            <div class="col-lg-2 col-md-4 col-6">
+
+                <a asp-page="/Products/Index"
+                   asp-route-category="Combo phòng trọ"
+                   class="text-decoration-none">
+
+                    <div class="category-card">
+
+                        <i class="bi bi-box-seam"></i>
+
+                        <h6>Combo phòng trọ</h6>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <!-- THỜI TRANG -->
+            <div class="col-lg-2 col-md-4 col-6">
+
+                <a asp-page="/Products/Index"
+                   asp-route-category="Thời trang sinh viên"
+                   class="text-decoration-none">
+
+                    <div class="category-card">
+
+                        <i class="bi bi-bag-heart"></i>
+
+                        <h6>Thời trang sinh viên</h6>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- VIP PRODUCTS -->
+<section class="py-5 vip-section">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+
+                <h2 class="fw-bold vip-title">
+                    👑 VIP Featured Products
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Premium products with highest promotion package
+                </p>
+
+            </div>
+
+        </div>
+
+        @if (!Model.VipProducts.Any())
+        {
+            <div class="alert alert-warning rounded-4">
+                Chưa có sản phẩm VIP.
+            </div>
+        }
+        else
+        {
+            <div class="row g-4 flex-nowrap overflow-auto pb-2">
+
+                @foreach (var product in Model.VipProducts)
+                {
+                    <div class="col-6 col-md-4 col-lg-2">
+
+                        <div class="product-card vip-card h-100">
+
+                            <div class="vip-badge">
+                                VIP
+                            </div>
+
+                            <div class="product-img-wrapper">
+
+                                @if (!string.IsNullOrEmpty(product.CoverImageUrl))
+                                {
+                                    <img src="@product.CoverImageUrl"
+                                         class="product-img"
+                                         alt="@product.Title">
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/400x300?text=No+Image"
+                                         class="product-img">
+                                }
+
+                            </div>
+
+                            <div class="p-3 d-flex flex-column h-100">
+
+                                <h5 class="product-title">
+                                    @product.Title
+                                </h5>
+
+                                <p class="small text-muted">
+                                    Seller: @product.SellerName
+                                </p>
+
+                                <div class="mb-3">
+
+                                    <span class="product-price">
+                                        @product.Price.ToString("N0") đ
+                                    </span>
+
+                                </div>
+
+                                <a asp-page="/Products/Detail"
+                                   asp-route-id="@product.ProductId"
+                                   class="btn btn-warning btn-sm mt-auto fw-bold">
+
+                                    View VIP
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</section>
+
+
+<!-- SPONSORED PRODUCTS -->
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+
+                <h2 class="fw-bold">
+                    🔥 Sponsored Products
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Products promoted by advertising packages
+                </p>
+
+            </div>
+
+        </div>
+
+        @if (!Model.SponsoredProducts.Any())
+        {
+            <div class="alert alert-info rounded-4">
+                Chưa có sản phẩm quảng cáo.
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+
+                @foreach (var product in Model.SponsoredProducts)
+                {
+                    <div class="col-6 col-md-4 col-lg-2">
+
+                        <div class="product-card h-100">
+
+                            <div class="product-img-wrapper">
+
+                                @if (!string.IsNullOrEmpty(product.CoverImageUrl))
+                                {
+                                    <img src="@product.CoverImageUrl"
+                                         class="product-img"
+                                         alt="@product.Title">
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/400x300?text=No+Image"
+                                         class="product-img">
+                                }
+
+                                <span class="badge bg-warning text-dark product-badge">
+                                    Sponsored
+                                </span>
+
+                            </div>
+
+                            <div class="p-3 d-flex flex-column h-100">
+
+                                <h5 class="product-title">
+                                    @product.Title
+                                </h5>
+
+                                <p class="small text-muted">
+                                    Seller: @product.SellerName
+                                </p>
+
+                                <div class="mb-3">
+
+                                    <span class="product-price">
+                                        @product.Price.ToString("N0") đ
+                                    </span>
+
+                                </div>
+
+                                <a asp-page="/Products/Detail"
+                                   asp-route-id="@product.ProductId"
+                                   class="btn btn-primary btn-sm mt-auto">
+
+                                    View Detail
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</section>
+
+
+<!-- FEATURED PRODUCTS -->
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h2 class="fw-bold">
+                Featured Products
+            </h2>
+
+            <a asp-page="/Products/Index"
+               class="text-decoration-none">
+
+                View all
+
+            </a>
+
+        </div>
+
+        @if (!Model.Products.Any())
+        {
+            <div class="alert alert-info rounded-4 shadow-sm">
+
+                Chưa có sản phẩm nào.
+
+            </div>
+        }
+        else
+        {
+            <div class="row g-4 flex-nowrap overflow-auto pb-2">
+
+                @foreach (var product in Model.Products.Take(6))
+                {
+                    <div class="col-6 col-md-4 col-lg-2">
+
+                        <div class="product-card h-100">
+
+                            <!-- IMAGE -->
+                            <div class="product-img-wrapper">
+
+                                @if (!string.IsNullOrEmpty(product.CoverImageUrl))
+                                {
+                                    <img src="@product.CoverImageUrl"
+                                         class="product-img"
+                                         alt="@product.Title">
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/400x300?text=No+Image"
+                                         class="product-img">
+                                }
+
+                                <span class="badge bg-primary product-badge">
+                                    @product.CategoryName
+                                </span>
+
+                            </div>
+
+                            <!-- BODY -->
+                            <div class="p-3 d-flex flex-column h-100">
+
+                                <h5 class="product-title">
+                                    @product.Title
+                                </h5>
+
+                                <p class="text-muted small mb-2">
+                                    @product.ConditionStatus
+                                </p>
+
+                                <p class="small text-muted mb-3">
+                                    Seller: @product.SellerName
+                                </p>
+
+                                <div class="mb-3">
+
+                                    <span class="product-price">
+                                        @product.Price.ToString("N0") đ
+                                    </span>
+
+                                </div>
+
+                                <div class="mt-auto d-flex gap-2">
+
+                                    <a asp-page="/Products/Detail"
+                                       asp-route-id="@product.ProductId"
+                                       class="btn btn-outline-primary btn-sm flex-fill">
+
+                                        Chi tiết
+
+                                    </a>
+
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <button class="btn btn-primary btn-sm flex-fill"
+                                                onclick="Cart.add(@product.ProductId)">
+
+                                            Add Cart
+
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a href="/Login"
+                                           class="btn btn-primary btn-sm flex-fill">
+                                            Login to Buy
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="row text-center g-4">
+
+            <div class="col-md-4">
+
+                <div class="feature-box">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    <h4>Safe Trading</h4>
+
+                    <p>
+                        Verified student accounts for secure transactions.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="feature-box">
+
+                    <i class="bi bi-cash-stack"></i>
+
+                    <h4>Affordable Prices</h4>
+
+                    <p>
+                        Buy used items with cheaper prices for students.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="feature-box">
+
+                    <i class="bi bi-recycle"></i>
+
+                    <h4>Sustainable</h4>
+
+                    <p>
+                        Reduce waste and help the environment.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<style>
+
+    body {
+        background: #f5f7fa;
+    }
+
+    /* HERO */
+    .hero-section {
+        min-height: 500px;
+        background: linear-gradient(135deg,#2563eb,#1e3a8a);
+    }
+
+    .hero-img {
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* CATEGORY */
+    .category-card {
+        background: white;
+        border-radius: 18px;
+        padding: 30px 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        height: 100%;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+        .category-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(37,99,235,0.15);
+        }
+
+        .category-card i {
+            font-size: 42px;
+            color: #2563eb;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .category-card h6 {
+            font-weight: 600;
+            margin: 0;
+            color: #1f2937;
+            min-height: 40px;
+        }
+
+    /* PRODUCT */
+    .product-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        min-width: 220px;
+        height: 100%;
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+    .product-img-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .product-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        font-size: 12px;
+        border-radius: 20px;
+        padding: 6px 10px;
+    }
+
+    .product-title {
+        font-size: 16px;
+        font-weight: 600;
+        min-height: 45px;
+        margin-bottom: 10px;
+    }
+
+    .product-price {
+        color: #2563eb;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    /* FEATURE BOX */
+    .feature-box {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+
+        .feature-box i {
+            font-size: 50px;
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+
+    /* HIDE SCROLLBAR */
+    .overflow-auto::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .overflow-auto::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 10px;
+    }
+    /* VIP SECTION */
+.vip-section {
+    background: linear-gradient(135deg,#fff7d6,#fff1a8);
+}
+
+.vip-title {
+    color: #d97706;
+}
+
+.vip-card {
+    border: 2px solid gold;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(255,193,7,0.35);
+}
+
+.vip-card:hover {
+    transform: translateY(-8px) scale(1.03);
+}
+
+.vip-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background: gold;
+    color: black;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 30px;
+    box-shadow: 0 0 15px rgba(255,215,0,0.8);
+}
+
+</style>
