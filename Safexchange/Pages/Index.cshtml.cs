@@ -1,20 +1,133 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using Safexchange.Models;
 
-namespace Safexchange.Pages
+namespace Safexchange.Pages;
+
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    private readonly SafexchangeDbContext _db;
+
+    public IndexModel(SafexchangeDbContext db)
     {
-        private readonly ILogger<IndexModel> _logger;
+        _db = db;
+    }
 
-        public IndexModel(ILogger<IndexModel> logger)
+    public IList<ProductListItem> Products { get; private set; } = new List<ProductListItem>();
+    public IList<ProductListItem> VipProducts { get; private set; } = new List<ProductListItem>();
+    public IList<ProductListItem> SponsoredProducts { get; private set; } = new List<ProductListItem>();
+    public IList<CategoryItem> Categories { get; private set; } = new List<CategoryItem>();
+
+    public async Task OnGetAsync(CancellationToken cancellationToken)
+    {
+        var now = DateTime.Now;
+
+        Categories = await _db.Categories
+            .AsNoTracking()
+            .Where(c => c.IsActive)
+            .OrderBy(c => c.CategoryName)
+            .Take(6)
+            .Select(c => new CategoryItem
+            {
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryName
+            })
+            .ToListAsync(cancellationToken);
+
+        Products = await LoadProductsAsync(
+            _db.Products.AsNoTracking(),
+            take: 12,
+            cancellationToken);
+
+        var promotedQuery = _db.PromotionLists
+            .AsNoTracking()
+            .Where(pl => pl.Status == "active"
+                && pl.StartAt <= now
+                && (pl.EndAt == null || pl.EndAt >= now)
+                && pl.PromotionOrder.PaymentStatus == "paid");
+
+        VipProducts = await LoadPromotedProductsAsync(
+            promotedQuery.Where(pl =>
+                pl.PromotionType == "combo_featured" || pl.PromotionType == "featured"),
+            take: 6,
+            cancellationToken);
+
+        SponsoredProducts = await LoadPromotedProductsAsync(
+            promotedQuery.Where(pl => pl.PromotionType == "boost"),
+            take: 6,
+            cancellationToken);
+    }
+
+    private async Task<List<ProductListItem>> LoadPromotedProductsAsync(
+        IQueryable<PromotionList> query,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        var productIds = await query
+            .OrderByDescending(pl => pl.PriorityScore)
+            .ThenByDescending(pl => pl.StartAt)
+            .Select(pl => pl.ProductId)
+            .Distinct()
+            .Take(take)
+            .ToListAsync(cancellationToken);
+
+        if (productIds.Count == 0)
         {
-            _logger = logger;
+            return new List<ProductListItem>();
         }
 
-        public void OnGet()
-        {
+        var products = await LoadProductsAsync(
+            _db.Products.AsNoTracking().Where(p => productIds.Contains(p.ProductId)),
+            take: productIds.Count,
+            cancellationToken);
 
-        }
+        return productIds
+            .Select(id => products.First(p => p.ProductId == id))
+            .ToList();
+    }
+
+    private async Task<List<ProductListItem>> LoadProductsAsync(
+        IQueryable<Product> query,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        return await query
+            .OrderByDescending(p => p.PublishedAt ?? p.CreatedAt)
+            .Take(take)
+            .Select(p => new ProductListItem
+            {
+                ProductId = p.ProductId,
+                Title = p.Title,
+                Price = p.Price,
+                ConditionStatus = p.ConditionStatus,
+                CategoryName = p.Category.CategoryName,
+                SellerName = p.Seller.FullName,
+                CoverImageUrl = p.ProductImages
+                    .OrderByDescending(i => i.IsCover)
+                    .ThenBy(i => i.SortOrder)
+                    .Select(i => i.ImageUrl)
+                    .FirstOrDefault()
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public static string GetCategoryIcon(string categoryName) =>
+        Safexchange.Pages.Products.IndexModel.GetCategoryIcon(categoryName);
+
+    public class ProductListItem
+    {
+        public int ProductId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public string ConditionStatus { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = string.Empty;
+        public string SellerName { get; set; } = string.Empty;
+        public string? CoverImageUrl { get; set; }
+    }
+
+    public class CategoryItem
+    {
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
     }
 }

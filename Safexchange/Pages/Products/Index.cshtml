@@ -4,78 +4,164 @@
     ViewData["Title"] = "Sản phẩm";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Danh sách sản phẩm</h1>
-    <div class="d-flex gap-2">
-        <a asp-page="/Products/Create" class="btn btn-primary">
-            Thêm sản phẩm
-        </a>
-        <button type="button" class="btn btn-outline-primary position-relative" onclick="Cart.openView()">
-            Giỏ hàng
-            <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
-        </button>
-    </div>
-</div>
+<div class="products-list-page">
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Danh sách sản phẩm</h1>
+            <p class="text-muted mb-0">Mua bán đồ dùng cũ an toàn dành cho sinh viên</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-page="/Products/Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Thêm sản phẩm
+            </a>
+            <button type="button" class="btn btn-outline-primary position-relative" onclick="Cart.openView()">
+                <i class="bi bi-cart3 me-1"></i> Giỏ hàng
+                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
+            </button>
+        </div>
     </div>
-}
 
-<form method="get" class="row g-2 mb-4">
-    <div class="col-md-8">
-        <input type="text" name="search" class="form-control" placeholder="Tìm theo tên sản phẩm..." value="@Request.Query["search"]" />
-    </div>
-    <div class="col-md-4">
-        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
-    </div>
-</form>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-@if (!Model.Products.Any())
-{
-    <div class="alert alert-info">Chưa có sản phẩm nào.</div>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach (var product in Model.Products)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-sm product-card">
-                    @if (!string.IsNullOrEmpty(product.CoverImageUrl))
-                    {
-                        <div class="product-thumb-frame card-img-top">
-                            <img src="@product.CoverImageUrl" class="product-thumb" alt="@product.Title" />
+    <section class="search-section py-4 mb-4">
+        <form method="get" class="mb-0">
+            @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+            {
+                <input type="hidden" name="category" value="@Model.SelectedCategory" />
+            }
+            <div class="input-group input-group-lg">
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Tìm laptop, bàn, ghế, sách..."
+                       value="@Model.Search" />
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-search"></i>
+                    Tìm kiếm
+                </button>
+            </div>
+        </form>
+    </section>
+
+    @if (Model.Categories.Any())
+    {
+        <section class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 fw-bold mb-0">Danh mục sản phẩm</h2>
+                @if (!string.IsNullOrEmpty(Model.SelectedCategory) || !string.IsNullOrEmpty(Model.Search))
+                {
+                    <a asp-page="/Products/Index" class="text-decoration-none small">Xóa bộ lọc</a>
+                }
+            </div>
+            <div class="row g-3">
+                @foreach (var cat in Model.Categories)
+                {
+                    var isActive = Model.SelectedCategory == cat.CategoryName;
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <a asp-page="/Products/Index"
+                           asp-route-category="@cat.CategoryName"
+                           asp-route-search="@Model.Search"
+                           class="text-decoration-none">
+                            <div class="category-card @(isActive ? "category-card--active" : "")">
+                                <i class="bi @IndexModel.GetCategoryIcon(cat.CategoryName)"></i>
+                                <h6>@cat.CategoryName</h6>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SelectedCategory) || !string.IsNullOrWhiteSpace(Model.Search))
+    {
+        <div class="mb-4 d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-muted small">Đang lọc:</span>
+            @if (!string.IsNullOrWhiteSpace(Model.Search))
+            {
+                <span class="badge rounded-pill bg-primary">Từ khóa: @Model.Search</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+            {
+                <span class="badge rounded-pill bg-secondary">@Model.SelectedCategory</span>
+            }
+        </div>
+    }
+
+    @if (!Model.Products.Any())
+    {
+        <div class="alert alert-info rounded-4 shadow-sm mb-0">
+            <i class="bi bi-inbox me-2"></i>
+            Chưa có sản phẩm phù hợp.
+        </div>
+    }
+    else
+    {
+        <p class="text-muted small mb-3">@Model.Products.Count sản phẩm</p>
+        <div class="row g-4">
+            @foreach (var product in Model.Products)
+            {
+                <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="product-card marketplace-card h-100">
+                        <div class="product-img-wrapper">
+                            @if (!string.IsNullOrEmpty(product.CoverImageUrl))
+                            {
+                                <img src="@product.CoverImageUrl"
+                                     class="product-img"
+                                     alt="@product.Title" />
+                            }
+                            else
+                            {
+                                <img src="https://via.placeholder.com/400x300?text=No+Image"
+                                     class="product-img"
+                                     alt="@product.Title" />
+                            }
+                            <span class="badge bg-primary product-badge">
+                                @product.CategoryName
+                            </span>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="product-thumb-frame product-thumb-frame--empty card-img-top">
-                            <span class="text-muted small">Không có ảnh</span>
-                        </div>
-                    }
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">@product.Title</h5>
-                        <p class="text-muted small mb-1">@product.CategoryName · @product.ConditionStatus</p>
-                        <p class="fw-bold text-primary mb-2">@product.Price.ToString("N0") đ</p>
-                        <p class="small text-muted mt-auto mb-3">Người bán: @product.SellerName</p>
-                        <div class="d-flex gap-2">
-                            <a asp-page="/Products/Detail" asp-route-id="@product.ProductId" class="btn btn-outline-primary btn-sm">
-                                Xem chi tiết
-                            </a>
-                            <a asp-page="/Products/Edit" asp-route-id="@product.ProductId" class="btn btn-outline-secondary btn-sm">
-                                Sửa
-                            </a>
+                        <div class="p-3 d-flex flex-column flex-grow-1">
+                            <h5 class="product-title">@product.Title</h5>
+                            <p class="text-muted small mb-2">@product.ConditionStatus</p>
+                            <p class="small text-muted mb-3">Người bán: @product.SellerName</p>
+                            <div class="mb-3">
+                                <span class="product-price">@product.Price.ToString("N0") đ</span>
+                            </div>
+                            <div class="mt-auto d-flex gap-2">
+                                <a asp-page="/Products/Detail"
+                                   asp-route-id="@product.ProductId"
+                                   class="btn btn-outline-primary btn-sm flex-fill">
+                                    Chi tiết
+                                </a>
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm flex-fill"
+                                            onclick="Cart.add(@product.ProductId)">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a href="/Login" class="btn btn-primary btn-sm flex-fill">
+                                        Mua
+                                    </a>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
+</div>
 
 @section Scripts {
     <script src="~/js/cart.js" asp-append-version="true"></script>

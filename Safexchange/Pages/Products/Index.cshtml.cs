@@ -14,9 +14,33 @@ public class IndexModel : PageModel
     }
 
     public IList<ProductListItem> Products { get; private set; } = new List<ProductListItem>();
+    public IList<CategoryItem> Categories { get; private set; } = new List<CategoryItem>();
+    public string? Search { get; private set; }
+    public string? SelectedCategory { get; private set; }
 
-    public async Task OnGetAsync(string? search, int? categoryId, CancellationToken cancellationToken)
+    public async Task OnGetAsync(string? search, int? categoryId, string? category, CancellationToken cancellationToken)
     {
+        Search = search;
+        SelectedCategory = category;
+
+        Categories = await _db.Categories
+            .AsNoTracking()
+            .Where(c => c.IsActive)
+            .OrderBy(c => c.CategoryName)
+            .Select(c => new CategoryItem
+            {
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryName
+            })
+            .ToListAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(SelectedCategory) && categoryId.HasValue)
+        {
+            SelectedCategory = Categories
+                .FirstOrDefault(c => c.CategoryId == categoryId.Value)?
+                .CategoryName;
+        }
+
         var query = _db.Products
             .AsNoTracking()
             .Include(p => p.Category)
@@ -30,7 +54,11 @@ public class IndexModel : PageModel
             query = query.Where(p => p.Title.Contains(search));
         }
 
-        if (categoryId.HasValue)
+        if (!string.IsNullOrWhiteSpace(SelectedCategory))
+        {
+            query = query.Where(p => p.Category.CategoryName == SelectedCategory);
+        }
+        else if (categoryId.HasValue)
         {
             query = query.Where(p => p.CategoryId == categoryId.Value);
         }
@@ -56,6 +84,17 @@ public class IndexModel : PageModel
             .ToListAsync(cancellationToken);
     }
 
+    public static string GetCategoryIcon(string categoryName) => categoryName switch
+    {
+        "Đồ điện tử" => "bi-laptop",
+        "Đồ học tập" => "bi-pencil-square",
+        "Sách/Giáo trình" => "bi-book",
+        "Đồ phòng trọ" => "bi-house-door",
+        "Combo phòng trọ" => "bi-box-seam",
+        "Thời trang sinh viên" => "bi-bag-heart",
+        _ => "bi-tag"
+    };
+
     public class ProductListItem
     {
         public int ProductId { get; set; }
@@ -67,5 +106,11 @@ public class IndexModel : PageModel
         public string CategoryName { get; set; } = string.Empty;
         public string SellerName { get; set; } = string.Empty;
         public string? CoverImageUrl { get; set; }
+    }
+
+    public class CategoryItem
+    {
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
     }
 }
