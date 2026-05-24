@@ -17,7 +17,9 @@ public class IndexModel : PageModel
         _currentUser = currentUser;
     }
 
-    public IReadOnlyList<ShipperOrderItem> Orders { get; private set; } = Array.Empty<ShipperOrderItem>();
+    public IReadOnlyList<ShipperOrderItem> AvailableOrders { get; private set; } = Array.Empty<ShipperOrderItem>();
+
+    public IReadOnlyList<ShipperOrderItem> MyOrders { get; private set; } = Array.Empty<ShipperOrderItem>();
 
     public string? Message { get; private set; }
 
@@ -61,13 +63,16 @@ public class IndexModel : PageModel
         var shipperId = await _shipmentService.GetShipperIdForUserAsync(_currentUser.GetUserId(), cancellationToken);
         if (!shipperId.HasValue)
         {
-            Orders = Array.Empty<ShipperOrderItem>();
+            AvailableOrders = Array.Empty<ShipperOrderItem>();
+            MyOrders = Array.Empty<ShipperOrderItem>();
             Message ??= "Tài khoản chưa được liên kết hồ sơ shipper.";
             IsError = true;
             return Page();
         }
 
-        Orders = await _shipmentService.GetShipperOrdersAsync(shipperId.Value, cancellationToken);
+        var orders = await _shipmentService.GetShipperOrdersAsync(shipperId.Value, cancellationToken);
+        AvailableOrders = orders.AvailableOrders;
+        MyOrders = orders.MyOrders;
         return Page();
     }
 }

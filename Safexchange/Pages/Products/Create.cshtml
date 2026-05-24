@@ -23,7 +23,7 @@
     <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
                     <!-- Tiêu đề -->
@@ -94,12 +94,15 @@
                         </div>
                     </div>
 
-                    <!-- URL ảnh bìa -->
+                    <!-- Ảnh sản phẩm -->
                     <div class="mb-3">
-                        <label asp-for="Input.CoverImageUrl" class="form-label fw-semibold">URL ảnh bìa</label>
-                        <input asp-for="Input.CoverImageUrl" class="form-control" placeholder="https://..." />
-                        <div class="form-text">Nhập đường link ảnh sản phẩm (nếu có)</div>
-                        <span asp-validation-for="Input.CoverImageUrl" class="text-danger small"></span>
+                        <label asp-for="CoverImage" class="form-label fw-semibold">Ảnh sản phẩm</label>
+                        <input asp-for="CoverImage" type="file" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp,.jpg,.jpeg,.png,.gif,.webp" id="coverImageInput" />
+                        <div class="form-text">JPG, PNG, GIF hoặc WEBP — tối đa 5MB. Ảnh được lưu trong thư mục Assets.</div>
+                        <span asp-validation-for="CoverImage" class="text-danger small"></span>
+                        <div id="imagePreviewWrap" class="image-preview-wrap mt-3 d-none">
+                            <img id="imagePreview" src="" alt="Xem trước ảnh" class="image-preview" />
+                        </div>
                     </div>
 
                     <!-- Thương lượng -->
@@ -124,4 +127,14 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('coverImageInput')?.addEventListener('change', function (e) {
+            const file = e.target.files?.[0];
+            const wrap = document.getElementById('imagePreviewWrap');
+            const img = document.getElementById('imagePreview');
+            if (!file || !wrap || !img) return;
+            img.src = URL.createObjectURL(file);
+            wrap.classList.remove('d-none');
+        });
+    </script>
 }

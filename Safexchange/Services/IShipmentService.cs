@@ -4,13 +4,20 @@ public interface IShipmentService
 {
     Task<int?> GetShipperIdForUserAsync(int userId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ShipperOrderItem>> GetShipperOrdersAsync(int shipperId, CancellationToken cancellationToken = default);
+    Task<ShipperOrdersView> GetShipperOrdersAsync(int shipperId, CancellationToken cancellationToken = default);
 
     Task<(bool Success, string Message)> AssignShipmentAsync(int shipmentId, int shipperId, CancellationToken cancellationToken = default);
 
     Task<(bool Success, string Message)> AdvanceShipmentStatusAsync(int shipmentId, int shipperId, CancellationToken cancellationToken = default);
 
     Task<(bool Success, string Message)> ConfirmCodPaymentAsync(int shipmentId, int shipperId, CancellationToken cancellationToken = default);
+}
+
+public class ShipperOrdersView
+{
+    public IReadOnlyList<ShipperOrderItem> AvailableOrders { get; init; } = Array.Empty<ShipperOrderItem>();
+
+    public IReadOnlyList<ShipperOrderItem> MyOrders { get; init; } = Array.Empty<ShipperOrderItem>();
 }
 
 public class ShipperOrderItem

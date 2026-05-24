@@ -47,12 +47,14 @@ else
                 <div class="card h-100 shadow-sm product-card">
                     @if (!string.IsNullOrEmpty(product.CoverImageUrl))
                     {
-                        <img src="@product.CoverImageUrl" class="card-img-top product-thumb" alt="@product.Title" />
+                        <div class="product-thumb-frame card-img-top">
+                            <img src="@product.CoverImageUrl" class="product-thumb" alt="@product.Title" />
+                        </div>
                     }
                     else
                     {
-                        <div class="card-img-top product-thumb bg-light d-flex align-items-center justify-content-center text-muted">
-                            Không có ảnh
+                        <div class="product-thumb-frame product-thumb-frame--empty card-img-top">
+                            <span class="text-muted small">Không có ảnh</span>
                         </div>
                     }
                     <div class="card-body d-flex flex-column">

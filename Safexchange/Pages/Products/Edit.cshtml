@@ -15,7 +15,7 @@
     <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
                     <!-- Hidden ID -->
@@ -89,12 +89,45 @@
                         </div>
                     </div>
 
-                    <!-- URL ảnh bìa -->
+                    <!-- Ảnh sản phẩm -->
                     <div class="mb-3">
-                        <label asp-for="Input.CoverImageUrl" class="form-label fw-semibold">URL ảnh bìa</label>
-                        <input asp-for="Input.CoverImageUrl" class="form-control" placeholder="https://..." />
-                        <div class="form-text">Nhập đường link ảnh sản phẩm (để trống nếu muốn xóa ảnh)</div>
-                        <span asp-validation-for="Input.CoverImageUrl" class="text-danger small"></span>
+                        <label class="form-label fw-semibold">Ảnh sản phẩm</label>
+
+                        <div class="product-edit-images product-edit-images--dual mb-3" id="imageCompareSection">
+                            @if (!string.IsNullOrEmpty(Model.CurrentCoverImageUrl))
+                            {
+                                <div id="currentImageSection">
+                                    <span class="small text-muted d-block mb-1">Ảnh hiện tại</span>
+                                    <div class="image-preview-wrap">
+                                        <img src="@Model.CurrentCoverImageUrl" alt="Ảnh hiện tại" class="image-preview" id="currentCoverImage" />
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted small mb-0" id="noImageHint">Sản phẩm chưa có ảnh.</p>
+                            }
+
+                            <div id="newImagePreviewWrap" class="d-none">
+                                <span class="small text-muted d-block mb-1">Ảnh mới (xem trước)</span>
+                                <div class="image-preview-wrap">
+                                    <img id="newImagePreview" src="" alt="Ảnh mới" class="image-preview" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <label asp-for="CoverImage" class="form-label fw-semibold">@(string.IsNullOrEmpty(Model.CurrentCoverImageUrl) ? "Chọn ảnh" : "Thay ảnh mới")</label>
+                        <input asp-for="CoverImage" type="file" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp,.jpg,.jpeg,.png,.gif,.webp" id="coverImageInput" />
+                        <div class="form-text">JPG, PNG, GIF hoặc WEBP — tối đa 5MB. Để trống nếu giữ ảnh hiện tại.</div>
+                        <span asp-validation-for="CoverImage" class="text-danger small"></span>
+
+                        @if (!string.IsNullOrEmpty(Model.CurrentCoverImageUrl))
+                        {
+                            <div class="form-check mt-3" id="removeImageCheckWrap">
+                                <input asp-for="RemoveCoverImage" class="form-check-input" type="checkbox" id="removeCoverImage" />
+                                <label asp-for="RemoveCoverImage" class="form-check-label">Xóa ảnh hiện tại</label>
+                            </div>
+                        }
                     </div>
 
                     <!-- Thương lượng -->
@@ -119,4 +152,31 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        const coverInput = document.getElementById('coverImageInput');
+        const newPreviewWrap = document.getElementById('newImagePreviewWrap');
+        const newPreviewImg = document.getElementById('newImagePreview');
+        const removeCheckbox = document.getElementById('removeCoverImage');
+
+        coverInput?.addEventListener('change', function (e) {
+            const file = e.target.files?.[0];
+            if (!file || !newPreviewWrap || !newPreviewImg) return;
+
+            newPreviewImg.src = URL.createObjectURL(file);
+            newPreviewWrap.classList.remove('d-none');
+
+            if (removeCheckbox) {
+                removeCheckbox.checked = false;
+            }
+        });
+
+        removeCheckbox?.addEventListener('change', function () {
+            if (this.checked && coverInput) {
+                coverInput.value = '';
+            }
+            if (this.checked && newPreviewWrap) {
+                newPreviewWrap.classList.add('d-none');
+            }
+        });
+    </script>
 }

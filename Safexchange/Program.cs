@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Safexchange.Models;
 using Safexchange.Services;
 
@@ -90,6 +91,12 @@ namespace Safexchange
 
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+            builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+
+            builder.Services.AddScoped<IShipmentService, ShipmentService>();
+
+            builder.Services.AddSingleton<IProductImageStorage, ProductImageStorage>();
+
             var app = builder.Build();
 
             // =========================================
@@ -111,6 +118,14 @@ namespace Safexchange
             // STATIC FILES
             // =========================================
             app.UseStaticFiles();
+
+            var assetsPath = Path.Combine(app.Environment.ContentRootPath, "Assets");
+            Directory.CreateDirectory(assetsPath);
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(assetsPath),
+                RequestPath = "/Assets"
+            });
 
             // =========================================
             // ROUTING

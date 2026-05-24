@@ -11,15 +11,23 @@ public class CreateModel : PageModel
 {
     private readonly SafexchangeDbContext _db;
     private readonly ICurrentUserService _currentUser;
+    private readonly IProductImageStorage _imageStorage;
 
-    public CreateModel(SafexchangeDbContext db, ICurrentUserService currentUser)
+    public CreateModel(
+        SafexchangeDbContext db,
+        ICurrentUserService currentUser,
+        IProductImageStorage imageStorage)
     {
         _db = db;
         _currentUser = currentUser;
+        _imageStorage = imageStorage;
     }
 
     [BindProperty]
     public ProductInputModel Input { get; set; } = new();
+
+    [BindProperty]
+    public IFormFile? CoverImage { get; set; }
 
     public SelectList CategoryList { get; private set; } = null!;
     public SelectList StatusList { get; private set; } = null!;
@@ -35,6 +43,19 @@ public class CreateModel : PageModel
 
         if (!ModelState.IsValid)
             return Page();
+
+        string? coverImageUrl = null;
+        if (CoverImage is not null)
+        {
+            var imageResult = await _imageStorage.SaveProductImageAsync(CoverImage, cancellationToken);
+            if (!imageResult.Success)
+            {
+                ModelState.AddModelError(nameof(CoverImage), imageResult.Error ?? "Không thể lưu ảnh.");
+                return Page();
+            }
+
+            coverImageUrl = imageResult.ImageUrl;
+        }
 
         var product = new Product
         {
@@ -55,13 +76,12 @@ public class CreateModel : PageModel
         _db.Products.Add(product);
         await _db.SaveChangesAsync(cancellationToken);
 
-        // Thêm ảnh bìa nếu có
-        if (!string.IsNullOrWhiteSpace(Input.CoverImageUrl))
+        if (!string.IsNullOrWhiteSpace(coverImageUrl))
         {
             _db.ProductImages.Add(new ProductImage
             {
                 ProductId = product.ProductId,
-                ImageUrl  = Input.CoverImageUrl,
+                ImageUrl  = coverImageUrl,
                 IsCover   = true,
                 SortOrder = 0
             });
@@ -118,7 +138,5 @@ public class CreateModel : PageModel
         public string ProductType { get; set; } = "normal";
 
         public bool IsNegotiable { get; set; }
-
-        public string? CoverImageUrl { get; set; }
     }
 }

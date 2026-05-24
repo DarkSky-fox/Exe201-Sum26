@@ -3,20 +3,31 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
+using Safexchange.Services;
 
 namespace Safexchange.Pages.Products;
 
 public class EditModel : PageModel
 {
     private readonly SafexchangeDbContext _db;
+    private readonly IProductImageStorage _imageStorage;
 
-    public EditModel(SafexchangeDbContext db)
+    public EditModel(SafexchangeDbContext db, IProductImageStorage imageStorage)
     {
         _db = db;
+        _imageStorage = imageStorage;
     }
 
     [BindProperty]
     public ProductEditInput Input { get; set; } = new();
+
+    [BindProperty]
+    public IFormFile? CoverImage { get; set; }
+
+    [BindProperty]
+    public bool RemoveCoverImage { get; set; }
+
+    public string? CurrentCoverImageUrl { get; private set; }
 
     public SelectList CategoryList { get; private set; } = null!;
     public SelectList StatusList { get; private set; } = null!;
@@ -25,31 +36,12 @@ public class EditModel : PageModel
     {
         var product = await _db.Products
             .AsNoTracking()
-            .Include(p => p.ProductImages)
             .FirstOrDefaultAsync(p => p.ProductId == id, cancellationToken);
 
         if (product is null)
             return NotFound();
 
-        Input = new ProductEditInput
-        {
-            ProductId      = product.ProductId,
-            Title          = product.Title,
-            Description    = product.Description,
-            Price          = product.Price,
-            OriginalPrice  = product.OriginalPrice,
-            CategoryId     = product.CategoryId,
-            StatusId       = product.StatusId,
-            ConditionStatus = product.ConditionStatus,
-            ProductType    = product.ProductType,
-            IsNegotiable   = product.IsNegotiable,
-            CoverImageUrl  = product.ProductImages
-                .OrderByDescending(i => i.IsCover)
-                .ThenBy(i => i.SortOrder)
-                .Select(i => i.ImageUrl)
-                .FirstOrDefault()
-        };
-
+        await LoadProductInputAsync(id, cancellationToken);
         await LoadSelectListsAsync(cancellationToken);
         return Page();
     }
@@ -57,6 +49,7 @@ public class EditModel : PageModel
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         await LoadSelectListsAsync(cancellationToken);
+        await LoadCurrentCoverImageAsync(Input.ProductId, cancellationToken);
 
         if (!ModelState.IsValid)
             return Page();
@@ -68,7 +61,6 @@ public class EditModel : PageModel
         if (product is null)
             return NotFound();
 
-        // Cập nhật các trường
         product.Title           = Input.Title;
         product.Description     = Input.Description;
         product.Price           = Input.Price;
@@ -79,17 +71,25 @@ public class EditModel : PageModel
         product.ProductType     = Input.ProductType;
         product.IsNegotiable    = Input.IsNegotiable;
 
-        // Cập nhật ảnh bìa
         var coverImage = product.ProductImages
             .OrderByDescending(i => i.IsCover)
             .ThenBy(i => i.SortOrder)
             .FirstOrDefault();
 
-        if (!string.IsNullOrWhiteSpace(Input.CoverImageUrl))
+        if (CoverImage is not null && CoverImage.Length > 0)
         {
+            var imageResult = await _imageStorage.SaveProductImageAsync(CoverImage, cancellationToken);
+            if (!imageResult.Success)
+            {
+                ModelState.AddModelError(nameof(CoverImage), imageResult.Error ?? "Không thể lưu ảnh.");
+                return Page();
+            }
+
+            var oldUrl = coverImage?.ImageUrl;
+
             if (coverImage is not null)
             {
-                coverImage.ImageUrl = Input.CoverImageUrl;
+                coverImage.ImageUrl = imageResult.ImageUrl!;
                 coverImage.IsCover  = true;
             }
             else
@@ -97,21 +97,64 @@ public class EditModel : PageModel
                 _db.ProductImages.Add(new ProductImage
                 {
                     ProductId = product.ProductId,
-                    ImageUrl  = Input.CoverImageUrl,
+                    ImageUrl  = imageResult.ImageUrl!,
                     IsCover   = true,
                     SortOrder = 0
                 });
             }
+
+            _imageStorage.TryDeleteProductImage(oldUrl);
+            CurrentCoverImageUrl = imageResult.ImageUrl;
         }
-        else if (coverImage is not null)
+        else if (RemoveCoverImage && coverImage is not null)
         {
+            var oldUrl = coverImage.ImageUrl;
             _db.ProductImages.Remove(coverImage);
+            _imageStorage.TryDeleteProductImage(oldUrl);
+            CurrentCoverImageUrl = null;
         }
 
         await _db.SaveChangesAsync(cancellationToken);
 
         TempData["SuccessMessage"] = "Sản phẩm đã được cập nhật!";
         return RedirectToPage("/Products/Index");
+    }
+
+    private async Task LoadProductInputAsync(int productId, CancellationToken cancellationToken)
+    {
+        var product = await _db.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ProductId == productId, cancellationToken);
+
+        if (product is null)
+            return;
+
+        Input = new ProductEditInput
+        {
+            ProductId       = product.ProductId,
+            Title           = product.Title,
+            Description     = product.Description,
+            Price           = product.Price,
+            OriginalPrice   = product.OriginalPrice,
+            CategoryId      = product.CategoryId,
+            StatusId        = product.StatusId,
+            ConditionStatus = product.ConditionStatus,
+            ProductType     = product.ProductType,
+            IsNegotiable    = product.IsNegotiable
+        };
+
+        await LoadCurrentCoverImageAsync(productId, cancellationToken);
+    }
+
+    private async Task LoadCurrentCoverImageAsync(int productId, CancellationToken cancellationToken)
+    {
+        CurrentCoverImageUrl = await _db.ProductImages
+            .AsNoTracking()
+            .Where(i => i.ProductId == productId)
+            .OrderByDescending(i => i.IsCover)
+            .ThenBy(i => i.SortOrder)
+            .Select(i => i.ImageUrl)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     private async Task LoadSelectListsAsync(CancellationToken ct)
@@ -162,7 +205,5 @@ public class EditModel : PageModel
         public string ProductType { get; set; } = "single";
 
         public bool IsNegotiable { get; set; }
-
-        public string? CoverImageUrl { get; set; }
     }
 }

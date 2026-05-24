@@ -43,11 +43,11 @@ public class ShipmentService : IShipmentService
         return profile.ShipperId;
     }
 
-    public async Task<IReadOnlyList<ShipperOrderItem>> GetShipperOrdersAsync(int shipperId, CancellationToken cancellationToken = default)
+    public async Task<ShipperOrdersView> GetShipperOrdersAsync(int shipperId, CancellationToken cancellationToken = default)
     {
         await _checkoutService.EnsureReferenceDataAsync(cancellationToken);
 
-        var shipments = await _db.Shipments
+        var query = _db.Shipments
             .AsNoTracking()
             .Include(s => s.Order)
                 .ThenInclude(o => o.Product)
@@ -55,36 +55,49 @@ public class ShipmentService : IShipmentService
                 .ThenInclude(o => o.Buyer)
             .Include(s => s.DeliveryAddress)
             .Include(s => s.ShipStatus)
-            .Where(s => s.ShipperId == null || s.ShipperId == shipperId)
-            .Where(s => s.ShipStatus!.StatusCode != "done")
+            .Where(s => s.ShipStatus!.StatusCode != "done");
+
+        var availableShipments = await query
+            .Where(s => s.ShipperId == null && s.ShipStatus!.StatusCode == "waiting")
             .OrderByDescending(s => s.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        return shipments.Select(s =>
-        {
-            var code = s.ShipStatus?.StatusCode ?? "";
-            var assigned = s.ShipperId == shipperId;
+        var myShipments = await query
+            .Where(s => s.ShipperId == shipperId)
+            .OrderByDescending(s => s.CreatedAt)
+            .ToListAsync(cancellationToken);
 
-            return new ShipperOrderItem
-            {
-                ShipmentId = s.ShipmentId,
-                OrderId = s.OrderId,
-                ProductTitle = s.Order.Product.Title,
-                BuyerName = s.Order.Buyer.FullName,
-                DeliveryAddress = s.DeliveryAddress.AddressLine,
-                DeliveryPhone = s.DeliveryAddress.Phone,
-                TotalAmount = s.Order.TotalAmount,
-                OrderStatus = s.Order.OrderStatus,
-                PaymentStatus = s.Order.PaymentStatus,
-                ShipStatusCode = code,
-                ShipStatusName = s.ShipStatus?.StatusName ?? code,
-                IsAssignedToMe = assigned,
-                CanTakeOrder = s.ShipperId is null && code == "waiting",
-                CanStartDelivery = assigned && code == "waiting",
-                CanMarkDelivered = assigned && code == "delivering",
-                CanConfirmCod = assigned && code == "delivered" && s.Order.PaymentStatus == "unpaid"
-            };
-        }).ToList();
+        return new ShipperOrdersView
+        {
+            AvailableOrders = availableShipments.Select(s => MapOrderItem(s, shipperId, isAvailablePool: true)).ToList(),
+            MyOrders = myShipments.Select(s => MapOrderItem(s, shipperId, isAvailablePool: false)).ToList()
+        };
+    }
+
+    private static ShipperOrderItem MapOrderItem(Shipment s, int shipperId, bool isAvailablePool)
+    {
+        var code = s.ShipStatus?.StatusCode ?? "";
+        var assigned = s.ShipperId == shipperId;
+
+        return new ShipperOrderItem
+        {
+            ShipmentId = s.ShipmentId,
+            OrderId = s.OrderId,
+            ProductTitle = s.Order.Product.Title,
+            BuyerName = s.Order.Buyer.FullName,
+            DeliveryAddress = s.DeliveryAddress.AddressLine,
+            DeliveryPhone = s.DeliveryAddress.Phone,
+            TotalAmount = s.Order.TotalAmount,
+            OrderStatus = s.Order.OrderStatus,
+            PaymentStatus = s.Order.PaymentStatus,
+            ShipStatusCode = code,
+            ShipStatusName = s.ShipStatus?.StatusName ?? code,
+            IsAssignedToMe = assigned,
+            CanTakeOrder = isAvailablePool,
+            CanStartDelivery = !isAvailablePool && assigned && code == "waiting",
+            CanMarkDelivered = !isAvailablePool && assigned && code == "delivering",
+            CanConfirmCod = !isAvailablePool && assigned && code == "delivered" && s.Order.PaymentStatus == "unpaid"
+        };
     }
 
     public async Task<(bool Success, string Message)> AssignShipmentAsync(
@@ -92,19 +105,19 @@ public class ShipmentService : IShipmentService
         int shipperId,
         CancellationToken cancellationToken = default)
     {
-        var shipment = await GetEditableShipmentAsync(shipmentId, shipperId, allowUnassigned: true, cancellationToken);
-        if (shipment is null)
+        var updated = await _db.Shipments
+            .Where(s => s.ShipmentId == shipmentId
+                && s.ShipperId == null
+                && s.ShipStatus!.StatusCode == "waiting")
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(x => x.ShipperId, shipperId),
+                cancellationToken);
+
+        if (updated == 0)
         {
             return (false, "Không tìm thấy đơn hoặc đơn đã được shipper khác nhận.");
         }
 
-        if (shipment.ShipperId.HasValue && shipment.ShipperId != shipperId)
-        {
-            return (false, "Đơn đã được shipper khác nhận.");
-        }
-
-        shipment.ShipperId = shipperId;
-        await _db.SaveChangesAsync(cancellationToken);
         return (true, "Đã nhận đơn giao hàng.");
     }
 
