@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Safexchange.Services;
 
 namespace Safexchange.Pages.Seller;
 
+[Authorize]
 public class IndexModel : PageModel
 {
     private readonly SafexchangeDbContext _db;

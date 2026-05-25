@@ -22,9 +22,18 @@
                         <a asp-page="/Products/Index" class="btn btn-light btn-lg px-4">
                             Mua ngay
                         </a>
-                        <a asp-page="/Seller/Index" class="btn btn-outline-light btn-lg px-4">
-                            Bán hàng
-                        </a>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a asp-page="/Seller/Index" class="btn btn-outline-light btn-lg px-4">
+                                Bán hàng
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-page="/Login" asp-route-returnUrl="/Seller/Index" class="btn btn-outline-light btn-lg px-4">
+                                Bán hàng
+                            </a>
+                        }
                     </div>
                 </div>
                 <div class="col-lg-6 text-center mt-4 mt-lg-0">
