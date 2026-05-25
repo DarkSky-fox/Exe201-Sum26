@@ -1,7 +1,9 @@
 @page
 @model Safexchange.Pages.Products.IndexModel
+@using Safexchange.Pages.Shared
 @{
     ViewData["Title"] = "Sản phẩm";
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
 }
 
 <div class="products-list-page">
@@ -105,59 +107,22 @@
     else
     {
         <p class="text-muted small mb-3">@Model.Products.Count sản phẩm</p>
-        <div class="row g-4">
+        <div class="products-grid">
             @foreach (var product in Model.Products)
             {
-                <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="product-card marketplace-card h-100">
-                        <div class="product-img-wrapper">
-                            @if (!string.IsNullOrEmpty(product.CoverImageUrl))
-                            {
-                                <img src="@product.CoverImageUrl"
-                                     class="product-img"
-                                     alt="@product.Title" />
-                            }
-                            else
-                            {
-                                <img src="https://via.placeholder.com/400x300?text=No+Image"
-                                     class="product-img"
-                                     alt="@product.Title" />
-                            }
-                            <span class="badge bg-primary product-badge">
-                                @product.CategoryName
-                            </span>
-                        </div>
-                        <div class="p-3 d-flex flex-column flex-grow-1">
-                            <h5 class="product-title">@product.Title</h5>
-                            <p class="text-muted small mb-2">@product.ConditionStatus</p>
-                            <p class="small text-muted mb-3">Người bán: @product.SellerName</p>
-                            <div class="mb-3">
-                                <span class="product-price">@product.Price.ToString("N0") đ</span>
-                            </div>
-                            <div class="mt-auto d-flex gap-2">
-                                <a asp-page="/Products/Detail"
-                                   asp-route-id="@product.ProductId"
-                                   class="btn btn-outline-primary btn-sm flex-fill">
-                                    Chi tiết
-                                </a>
-                                @if (User.Identity?.IsAuthenticated == true)
-                                {
-                                    <button type="button"
-                                            class="btn btn-primary btn-sm flex-fill"
-                                            onclick="Cart.add(@product.ProductId)">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                }
-                                else
-                                {
-                                    <a href="/Login" class="btn btn-primary btn-sm flex-fill">
-                                        Mua
-                                    </a>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <partial name="Shared/_HomeProductCard"
+                         model="HomeProductCardViewModel.FromListItem(
+                             product.ProductId,
+                             product.Title,
+                             product.Price,
+                             product.SellerName,
+                             product.CategoryName,
+                             product.ConditionStatus,
+                             product.CoverImageUrl,
+                             HomeProductCardVariant.Catalog,
+                             isAuthenticated,
+                             showCartActions: true,
+                             cartIconOnly: true)" />
             }
         </div>
     }

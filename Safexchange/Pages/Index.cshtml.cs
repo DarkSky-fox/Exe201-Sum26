@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
+using Safexchange.Pages.Shared;
 
 namespace Safexchange.Pages;
 
@@ -113,6 +114,23 @@ public class IndexModel : PageModel
 
     public static string GetCategoryIcon(string categoryName) =>
         Safexchange.Pages.Products.IndexModel.GetCategoryIcon(categoryName);
+
+    public static HomeProductCardViewModel ToCard(
+        ProductListItem product,
+        HomeProductCardVariant variant,
+        bool isAuthenticated,
+        bool showCartActions = false) =>
+        HomeProductCardViewModel.FromListItem(
+            product.ProductId,
+            product.Title,
+            product.Price,
+            product.SellerName,
+            product.CategoryName,
+            product.ConditionStatus,
+            product.CoverImageUrl,
+            variant,
+            isAuthenticated,
+            showCartActions);
 
     public class ProductListItem
     {
