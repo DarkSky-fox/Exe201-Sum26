@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model Safexchange.Pages.Admin.DashboardModel
 @{
     Layout = "_AdminLayout";
@@ -6,7 +6,12 @@
 }
 
 <div class="container-fluid">
-    <h2 class="mb-4">Dashboard Thống Kê</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Dashboard Thống Kê</h2>
+        <a asp-page="/Index" class="btn btn-outline-secondary">
+            <i class="bi bi-house-door"></i> Quay về trang chủ
+        </a>
+    </div>
 
     <div class="row">
         <div class="col-md-4">
