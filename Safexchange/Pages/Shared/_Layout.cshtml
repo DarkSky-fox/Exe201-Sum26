@@ -118,17 +118,15 @@
     </header>
     @if (ViewData["FullWidth"] as bool? == true)
     {
-        <main role="main" class="pb-0">
+        <main role="main" class="page-main pb-4">
             @RenderBody()
         </main>
     }
     else
     {
-        <div class="container">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
+        <main role="main" class="page-main container pb-4">
+            @RenderBody()
+        </main>
     }
 
     <footer class="border-top footer text-muted">

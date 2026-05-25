@@ -1,0 +1,114 @@
+@model Safexchange.Pages.Shared.HomeProductCardViewModel
+@{
+    var cardClass = Model.Variant switch
+    {
+        HomeProductCardVariant.Vip => "product-card-ui product-card-ui--vip",
+        HomeProductCardVariant.Sponsored => "product-card-ui product-card-ui--sponsored",
+        _ => "product-card-ui"
+    };
+    var badgeText = Model.Variant switch
+    {
+        HomeProductCardVariant.Sponsored => "Quảng cáo",
+        HomeProductCardVariant.Featured or HomeProductCardVariant.Catalog => Model.CategoryName,
+        _ => null
+    };
+    var badgeClass = Model.Variant == HomeProductCardVariant.Sponsored
+        ? "badge bg-warning text-dark"
+        : "badge bg-primary";
+    var showCondition = Model.Variant is HomeProductCardVariant.Featured or HomeProductCardVariant.Catalog;
+    var showActions = Model.ShowCartActions || Model.Variant == HomeProductCardVariant.Catalog;
+}
+
+<article class="@cardClass">
+    @if (Model.Variant == HomeProductCardVariant.Vip)
+    {
+        <span class="product-card-ui__vip-badge">VIP</span>
+    }
+
+    <a asp-page="/Products/Detail"
+       asp-route-id="@Model.ProductId"
+       class="product-card-ui__media text-decoration-none">
+        <div class="product-card-ui__img-placeholder" aria-hidden="true">
+            <i class="bi bi-image"></i>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.ResolvedImageUrl))
+        {
+            <img src="@Model.ResolvedImageUrl"
+                 class="product-card-ui__img"
+                 alt=""
+                 loading="lazy"
+                 onerror="this.remove();" />
+        }
+        @if (!string.IsNullOrEmpty(badgeText))
+        {
+            <span class="@badgeClass product-card-ui__badge">@badgeText</span>
+        }
+    </a>
+
+    <div class="product-card-ui__body">
+        <h3 class="product-card-ui__title">
+            <a asp-page="/Products/Detail"
+               asp-route-id="@Model.ProductId"
+               class="text-decoration-none text-dark">
+                @Model.Title
+            </a>
+        </h3>
+
+        @if (showCondition && !string.IsNullOrEmpty(Model.ConditionLabel))
+        {
+            <p class="product-card-ui__meta">@Model.ConditionLabel</p>
+        }
+
+        <p class="product-card-ui__seller">Người bán: @Model.SellerName</p>
+        <p class="product-card-ui__price">@Model.Price.ToString("N0") đ</p>
+
+        @if (Model.Variant == HomeProductCardVariant.Vip)
+        {
+            <a asp-page="/Products/Detail"
+               asp-route-id="@Model.ProductId"
+               class="btn btn-warning btn-sm w-100 fw-semibold mt-auto">
+                Xem VIP
+            </a>
+        }
+        else if (Model.Variant == HomeProductCardVariant.Sponsored)
+        {
+            <a asp-page="/Products/Detail"
+               asp-route-id="@Model.ProductId"
+               class="btn btn-primary btn-sm w-100 mt-auto">
+                Xem chi tiết
+            </a>
+        }
+        else if (showActions)
+        {
+            <div class="product-card-ui__actions mt-auto">
+                <a asp-page="/Products/Detail"
+                   asp-route-id="@Model.ProductId"
+                   class="btn btn-outline-primary btn-sm">
+                    Chi tiết
+                </a>
+                @if (Model.IsAuthenticated)
+                {
+                    <button type="button"
+                            class="btn btn-primary btn-sm @(Model.CartIconOnly ? "product-card-ui__cart-btn" : "")"
+                            title="Thêm vào giỏ"
+                            onclick="event.stopPropagation(); Cart.add(@Model.ProductId);">
+                        @if (Model.CartIconOnly)
+                        {
+                            <i class="bi bi-cart-plus"></i>
+                        }
+                        else
+                        {
+                            <text>Thêm giỏ</text>
+                        }
+                    </button>
+                }
+                else
+                {
+                    <a href="/Login" class="btn btn-primary btn-sm">
+                        @(Model.CartIconOnly ? "Mua" : "Đăng nhập")
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</article>
