@@ -1,8 +1,10 @@
 @page
 @model Safexchange.Pages.IndexModel
+@using Safexchange.Pages.Shared
 @{
     ViewData["Title"] = "Trang Chủ";
     ViewData["FullWidth"] = true;
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
 }
 
 <div class="home-page">
@@ -116,43 +118,17 @@
             }
             else
             {
-                <div class="row g-4 flex-nowrap overflow-auto pb-2">
+                <div class="home-product-track">
                     @foreach (var product in Model.VipProducts)
                     {
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <div class="product-card vip-card h-100">
-                                <div class="vip-badge">VIP</div>
-                                <div class="product-img-wrapper">
-                                    @if (!string.IsNullOrEmpty(product.CoverImageUrl))
-                                    {
-                                        <img src="@product.CoverImageUrl" class="product-img" alt="@product.Title" />
-                                    }
-                                    else
-                                    {
-                                        <img src="https://via.placeholder.com/400x300?text=No+Image" class="product-img" alt="@product.Title" />
-                                    }
-                                </div>
-                                <div class="p-3 d-flex flex-column h-100">
-                                    <h5 class="product-title">@product.Title</h5>
-                                    <p class="small text-muted">Người bán: @product.SellerName</p>
-                                    <div class="mb-3">
-                                        <span class="product-price">@product.Price.ToString("N0") đ</span>
-                                    </div>
-                                    <a asp-page="/Products/Detail"
-                                       asp-route-id="@product.ProductId"
-                                       class="btn btn-warning btn-sm mt-auto fw-bold">
-                                        Xem VIP
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        <partial name="Shared/_HomeProductCard" model="IndexModel.ToCard(product, HomeProductCardVariant.Vip, isAuthenticated)" />
                     }
                 </div>
             }
         </div>
     </section>
 
-    <section class="py-5 bg-light">
+    <section class="py-5 section-muted">
         <div class="container">
             <div class="mb-4">
                 <h2 class="fw-bold mb-1">🔥 Sản phẩm quảng cáo</h2>
@@ -164,43 +140,17 @@
             }
             else
             {
-                <div class="row g-4">
+                <div class="home-product-grid">
                     @foreach (var product in Model.SponsoredProducts)
                     {
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <div class="product-card h-100">
-                                <div class="product-img-wrapper">
-                                    @if (!string.IsNullOrEmpty(product.CoverImageUrl))
-                                    {
-                                        <img src="@product.CoverImageUrl" class="product-img" alt="@product.Title" />
-                                    }
-                                    else
-                                    {
-                                        <img src="https://via.placeholder.com/400x300?text=No+Image" class="product-img" alt="@product.Title" />
-                                    }
-                                    <span class="badge bg-warning text-dark product-badge">Quảng cáo</span>
-                                </div>
-                                <div class="p-3 d-flex flex-column h-100">
-                                    <h5 class="product-title">@product.Title</h5>
-                                    <p class="small text-muted">Người bán: @product.SellerName</p>
-                                    <div class="mb-3">
-                                        <span class="product-price">@product.Price.ToString("N0") đ</span>
-                                    </div>
-                                    <a asp-page="/Products/Detail"
-                                       asp-route-id="@product.ProductId"
-                                       class="btn btn-primary btn-sm mt-auto">
-                                        Xem chi tiết
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        <partial name="Shared/_HomeProductCard" model="IndexModel.ToCard(product, HomeProductCardVariant.Sponsored, isAuthenticated)" />
                     }
                 </div>
             }
         </div>
     </section>
 
-    <section class="py-5 bg-light">
+    <section class="py-5 section-muted">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="fw-bold mb-0">Sản phẩm nổi bật</h2>
@@ -212,53 +162,10 @@
             }
             else
             {
-                <div class="row g-4 flex-nowrap overflow-auto pb-2">
+                <div class="home-product-track">
                     @foreach (var product in Model.Products.Take(6))
                     {
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <div class="product-card h-100">
-                                <div class="product-img-wrapper">
-                                    @if (!string.IsNullOrEmpty(product.CoverImageUrl))
-                                    {
-                                        <img src="@product.CoverImageUrl" class="product-img" alt="@product.Title" />
-                                    }
-                                    else
-                                    {
-                                        <img src="https://via.placeholder.com/400x300?text=No+Image" class="product-img" alt="@product.Title" />
-                                    }
-                                    <span class="badge bg-primary product-badge">@product.CategoryName</span>
-                                </div>
-                                <div class="p-3 d-flex flex-column h-100">
-                                    <h5 class="product-title">@product.Title</h5>
-                                    <p class="text-muted small mb-2">@product.ConditionStatus</p>
-                                    <p class="small text-muted mb-3">Người bán: @product.SellerName</p>
-                                    <div class="mb-3">
-                                        <span class="product-price">@product.Price.ToString("N0") đ</span>
-                                    </div>
-                                    <div class="mt-auto d-flex gap-2">
-                                        <a asp-page="/Products/Detail"
-                                           asp-route-id="@product.ProductId"
-                                           class="btn btn-outline-primary btn-sm flex-fill">
-                                            Chi tiết
-                                        </a>
-                                        @if (User.Identity?.IsAuthenticated == true)
-                                        {
-                                            <button type="button"
-                                                    class="btn btn-primary btn-sm flex-fill"
-                                                    onclick="Cart.add(@product.ProductId)">
-                                                Thêm giỏ
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <a href="/Login" class="btn btn-primary btn-sm flex-fill">
-                                                Đăng nhập
-                                            </a>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <partial name="Shared/_HomeProductCard" model="IndexModel.ToCard(product, HomeProductCardVariant.Featured, isAuthenticated, showCartActions: true)" />
                     }
                 </div>
             }
