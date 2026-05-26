@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Library Admin</title>
+    <title>@ViewData["Title"] - Safexchange Admin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -72,13 +72,13 @@
     <div id="wrapper">
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h5 class="m-0">Library Admin</h5>
+                <h5 class="m-0">Safexchange Admin</h5>
             </div>
             <ul class="list-unstyled mt-3">
-                <li><a asp-page="/Admin/Dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                <li><a asp-page="/Admin/BookManagement/Index" class="active"><i class="bi bi-book me-2"></i> Products</a></li>
-                <li><a asp-page="/Admin/CategoryManagement/Index"><i class="bi bi-tags me-2"></i> Categories</a></li>
-                <li><a asp-page="/Admin/UserManagement/Index"><i class="bi bi-people me-2"></i> Users</a></li>
+                <li><a asp-page="/Admin/Dashboard" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Admin/Dashboard" ? "active" : "")"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                <li><a asp-page="/Admin/ProducManagement/Index" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/ProductManagement") == true ? "active" : "")"><i class="bi bi-box-seam me-2"></i> Products</a></li>
+                <li><a asp-page="/Admin/CategoryManagement/Index" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/CategoryManagement") == true ? "active" : "")"><i class="bi bi-tags me-2"></i> Categories</a></li>
+                <li><a asp-page="/Admin/UserManagement/Index" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/UserManagement") == true ? "active" : "")"><i class="bi bi-people me-2"></i> Users</a></li>
                 <li class="border-top mt-3"><a asp-page="/Index" class="text-warning"><i class="bi bi-arrow-left-circle me-2"></i> View Website</a></li>
             </ul>
         </nav>

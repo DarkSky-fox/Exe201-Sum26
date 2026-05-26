@@ -47,10 +47,15 @@ namespace Safexchange
                 .AddGoogle(options =>
                 {
                     options.ClientId =
-                        builder.Configuration["Authentication:Google:ClientId"];
+                        builder.Configuration["Authentication:Google:ClientId"]
+                        ?? string.Empty;
 
                     options.ClientSecret =
-                        builder.Configuration["Authentication:Google:ClientSecret"];
+                        builder.Configuration["Authentication:Google:ClientSecret"]
+                        ?? string.Empty;
+
+                    options.CallbackPath = "/signin-google";
+                    options.SaveTokens = true;
                 });
 
             // =========================================

@@ -29,6 +29,14 @@ namespace Safexchange.Pages
 
         public string Message { get; set; }
 
+        public void OnGet(string? message)
+        {
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                Message = message;
+            }
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             // HASH PASSWORD

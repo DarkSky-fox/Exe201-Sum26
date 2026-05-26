@@ -1,0 +1,111 @@
+@page
+@model Safexchange.Pages.Admin.UserManagement.VerifyModel
+
+@{
+    ViewData["Title"] = "Xác thực người dùng";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid text-start px-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1 text-dark fw-bold">Xác thực người dùng</h2>
+            <p class="text-muted mb-0">Thêm minh chứng xác thực cho người dùng <strong>@Model.TargetUser.FullName</strong>.</p>
+        </div>
+        <div>
+            <a asp-page="./Index" class="btn btn-outline-secondary shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">Thông tin xác thực</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="UserVerification.UserId" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Loại xác thực</label>
+                            <select asp-for="UserVerification.VerificationType" class="form-select" required>
+                                <option value="">-- Chọn loại xác thực --</option>
+                                <option value="student_email">Email Sinh viên</option>
+                                <option value="student_card">Thẻ Sinh viên</option>
+                            </select>
+                            <span asp-validation-for="UserVerification.VerificationType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Giá trị xác thực</label>
+                            <input asp-for="UserVerification.VerificationValue" class="form-control" placeholder="Ví dụ: SE123456 hoặc SV001" required />
+                            <span asp-validation-for="UserVerification.VerificationValue" class="text-danger small"></span>
+                            <div class="form-text small">Nhập Mã số sinh viên hoặc Email sinh viên tùy theo loại xác thực.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Link minh chứng (URL)</label>
+                            <input asp-for="UserVerification.DocumentUrl" class="form-control" placeholder="https://..." />
+                            <span asp-validation-for="UserVerification.DocumentUrl" class="text-danger small"></span>
+                            <div class="form-text small">Dán link ảnh thẻ sinh viên hoặc ảnh chụp minh chứng.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Trạng thái ban đầu</label>
+                            <select asp-for="UserVerification.Status" class="form-select" required>
+                                <option value="Pending">Chờ duyệt (Pending)</option>
+                                <option value="Approved">Duyệt ngay (Approved)</option>
+                                <option value="Rejected">Từ chối ngay (Rejected)</option>
+                            </select>
+                            <span asp-validation-for="UserVerification.Status" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary shadow-sm">
+                                <i class="fas fa-save me-2"></i>Lưu thông tin xác thực
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Thông tin người dùng</h5>
+                    <div class="mb-2">
+                        <strong>Họ tên:</strong> @Model.TargetUser.FullName
+                    </div>
+                    <div class="mb-2">
+                        <strong>Email:</strong> @Model.TargetUser.Email
+                    </div>
+                    <div class="mb-2">
+                        <strong>Số điện thoại:</strong> @(string.IsNullOrEmpty(Model.TargetUser.Phone) ? "Chưa cập nhật" : Model.TargetUser.Phone)
+                    </div>
+                    <div class="mb-2">
+                        <strong>Vai trò:</strong> @Model.TargetUser.Role
+                    </div>
+                    <div class="mb-2">
+                        <strong>Trạng thái:</strong> 
+                        <span class="badge @(Model.TargetUser.AccountStatus == "active" ? "bg-success" : "bg-warning")">
+                            @Model.TargetUser.AccountStatus
+                        </span>
+                    </div>
+                    <hr />
+                    <p class="small text-muted mb-0">
+                        <i class="fas fa-info-circle me-1"></i> Sau khi lưu, thông tin này sẽ xuất hiện trong danh sách <strong>Quản lý xác thực</strong> để Admin có thể xem lại hoặc thay đổi trạng thái nếu cần.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

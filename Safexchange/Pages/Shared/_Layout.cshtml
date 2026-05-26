@@ -35,6 +35,12 @@
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Shipper/Index">Giao hàng</a>
                             </li>
                         }
+                        @if (User.IsInRole("admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-bold" asp-area="" asp-page="/Admin/Dashboard">Admin Dashboard</a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav d-flex align-items-center gap-2">
 
@@ -118,17 +124,15 @@
     </header>
     @if (ViewData["FullWidth"] as bool? == true)
     {
-        <main role="main" class="pb-0">
+        <main role="main" class="page-main pb-4">
             @RenderBody()
         </main>
     }
     else
     {
-        <div class="container">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
+        <main role="main" class="page-main container pb-4">
+            @RenderBody()
+        </main>
     }
 
     <footer class="border-top footer text-muted">
