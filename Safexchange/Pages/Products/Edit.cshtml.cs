@@ -166,8 +166,10 @@ public class EditModel : PageModel
             .Select(c => new { c.CategoryId, c.CategoryName })
             .ToListAsync(ct);
 
+        var allowedStatusNames = new List<string> { "Đang hiển thị", "Đã ẩn" };
         var statuses = await _db.ProductStatuses
             .AsNoTracking()
+            .Where(s => allowedStatusNames.Contains(s.StatusName))
             .OrderBy(s => s.StatusId)
             .Select(s => new { s.StatusId, s.StatusName })
             .ToListAsync(ct);

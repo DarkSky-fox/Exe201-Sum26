@@ -56,19 +56,12 @@
 
                     <!-- Danh mục & Trạng thái -->
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label asp-for="Input.CategoryId" class="form-label fw-semibold">Danh mục <span class="text-danger">*</span></label>
                             <select asp-for="Input.CategoryId" asp-items="Model.CategoryList" class="form-select">
                                 <option value="">-- Chọn danh mục --</option>
                             </select>
                             <span asp-validation-for="Input.CategoryId" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Input.StatusId" class="form-label fw-semibold">Trạng thái đăng <span class="text-danger">*</span></label>
-                            <select asp-for="Input.StatusId" asp-items="Model.StatusList" class="form-select">
-                                <option value="">-- Chọn trạng thái --</option>
-                            </select>
-                            <span asp-validation-for="Input.StatusId" class="text-danger small"></span>
                         </div>
                     </div>
 

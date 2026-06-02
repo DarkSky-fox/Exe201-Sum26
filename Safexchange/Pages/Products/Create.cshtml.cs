@@ -30,7 +30,6 @@ public class CreateModel : PageModel
     public IFormFile? CoverImage { get; set; }
 
     public SelectList CategoryList { get; private set; } = null!;
-    public SelectList StatusList { get; private set; } = null!;
 
     public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
@@ -72,7 +71,9 @@ public class CreateModel : PageModel
         {
             SellerId    = _currentUser.GetUserId(),
             CategoryId  = Input.CategoryId,
-            StatusId    = Input.StatusId,
+            StatusId    = (await _db.ProductStatuses.FirstOrDefaultAsync(s => s.StatusName == "Đang hiển thị", cancellationToken))?.StatusId 
+                          ?? (await _db.ProductStatuses.FirstOrDefaultAsync(s => s.StatusCode == "available", cancellationToken))?.StatusId 
+                          ?? 1, // Fallback to 1 if nothing else found
             Title       = Input.Title,
             Description = Input.Description,
             Price       = Input.Price,
@@ -112,14 +113,7 @@ public class CreateModel : PageModel
             .Select(c => new { c.CategoryId, c.CategoryName })
             .ToListAsync(ct);
 
-        var statuses = await _db.ProductStatuses
-            .AsNoTracking()
-            .OrderBy(s => s.StatusId)
-            .Select(s => new { s.StatusId, s.StatusName })
-            .ToListAsync(ct);
-
         CategoryList = new SelectList(categories, "CategoryId", "CategoryName");
-        StatusList   = new SelectList(statuses,   "StatusId",   "StatusName");
     }
 
     public class ProductInputModel
@@ -138,9 +132,6 @@ public class CreateModel : PageModel
 
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Vui lòng chọn danh mục")]
         public int CategoryId { get; set; }
-
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Vui lòng chọn trạng thái")]
-        public int StatusId { get; set; }
 
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Vui lòng chọn tình trạng sản phẩm")]
         public string ConditionStatus { get; set; } = "like_new";
