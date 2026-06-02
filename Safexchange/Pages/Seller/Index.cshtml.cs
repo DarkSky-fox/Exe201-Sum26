@@ -22,18 +22,28 @@ public class IndexModel : PageModel
     public IList<ProductListItem> Products { get; private set; } = new List<ProductListItem>();
     public bool IsVerified { get; private set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? Status { get; set; }
+
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         IsVerified = await _currentUserService.IsUserVerifiedAsync();
         
         var currentUserId = _currentUserService.GetUserId();
 
-        Products = await _db.Products
+        var query = _db.Products
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Status)
             .Include(p => p.ProductImages)
-            .Where(p => p.SellerId == currentUserId)
+            .Where(p => p.SellerId == currentUserId);
+
+        if (!string.IsNullOrEmpty(Status))
+        {
+            query = query.Where(p => p.Status.StatusName == Status);
+        }
+
+        Products = await query
             .OrderByDescending(p => p.CreatedAt)
             .Select(p => new ProductListItem
             {

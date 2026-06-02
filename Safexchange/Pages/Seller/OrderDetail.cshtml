@@ -1,0 +1,176 @@
+@page
+@model Safexchange.Pages.Seller.OrderDetailModel
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="./Index">Quản lý sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chi tiết đơn hàng</li>
+        </ol>
+    </nav>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi bi-exclamation-octagon-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Thông tin sản phẩm & Đơn hàng -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">Thông tin sản phẩm</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        @{
+                            var coverImage = Model.Order?.Product.ProductImages
+                                .OrderByDescending(i => i.IsCover)
+                                .ThenBy(i => i.SortOrder)
+                                .FirstOrDefault();
+                        }
+                        @if (coverImage != null)
+                        {
+                            <img src="@coverImage.ImageUrl" alt="@Model.Order?.Product.Title" class="rounded me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                        }
+                        <div>
+                            <h4 class="mb-1">@Model.Order?.Product.Title</h4>
+                            <p class="text-primary fw-bold mb-0">@Model.Order?.ItemPrice.ToString("N0") đ</p>
+                        </div>
+                    </div>
+                    <hr class="text-muted opacity-25">
+                    <div class="row text-center py-2">
+                        <div class="col">
+                            <p class="text-muted small mb-1">Mã đơn hàng</p>
+                            <p class="fw-bold mb-0">#@Model.Order?.OrderId</p>
+                        </div>
+                        <div class="col">
+                            <p class="text-muted small mb-1">Ngày tạo</p>
+                            <p class="fw-bold mb-0">@Model.Order?.CreatedAt.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col">
+                            <p class="text-muted small mb-1">Tổng cộng</p>
+                            <p class="fw-bold text-success mb-0">@Model.Order?.TotalAmount.ToString("N0") đ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">Thông tin người mua</h5>
+                </div>
+                <div class="card-body">
+                    @{
+                        var address = Model.Order?.Shipment?.DeliveryAddress 
+                                      ?? Model.Order?.Buyer.UserAddresses.FirstOrDefault(a => a.IsDefault) 
+                                      ?? Model.Order?.Buyer.UserAddresses.FirstOrDefault();
+                    }
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <p class="text-muted small mb-1"><i class="bi bi-person-fill"></i> Người nhận</p>
+                                <p class="fw-bold mb-0">@(address?.ReceiverName ?? Model.Order?.Buyer.FullName)</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <p class="text-muted small mb-1"><i class="bi bi-envelope-fill"></i> Email liên hệ</p>
+                                <p class="fw-bold mb-0">@Model.Order?.Buyer.Email</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <p class="text-muted small mb-1"><i class="bi bi-telephone-fill"></i> Số điện thoại</p>
+                                <p class="fw-bold mb-0">@(address?.Phone ?? Model.Order?.Buyer.Phone ?? "Chưa cung cấp")</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <p class="text-muted small mb-1"><i class="bi bi-credit-card-fill"></i> Trạng thái thanh toán</p>
+                                <span class="badge @(Model.Order?.PaymentStatus == "paid" ? "bg-success" : "bg-warning")">@Model.Order?.PaymentStatus</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-3">
+                                <p class="text-muted small mb-1"><i class="bi bi-geo-alt-fill"></i> Địa chỉ nhận hàng</p>
+                                @if (address != null)
+                                {
+                                    <p class="fw-bold mb-0">
+                                        @address.AddressLine
+                                        @if (address.Area != null)
+                                        {
+                                            <br />
+                                            <span class="text-secondary small fw-normal">
+                                                @address.Area.AreaName (@address.Area.Ward, @address.Area.District, @address.Area.City)
+                                            </span>
+                                        }
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="text-muted mb-0 italic">Chưa có thông tin địa chỉ</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cập nhật trạng thái -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 2rem; z-index: 1020;">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">Cập nhật đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <input type="hidden" name="orderId" value="@Model.Order?.OrderId" />
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold">Trạng thái đơn hàng</label>
+                            <select asp-for="NewStatus" class="form-select border-0 bg-light py-3 px-4 rounded-3 shadow-none">
+                                <option value="pending">Đang chờ</option>
+                                <option value="confirmed">Đã xác nhận</option>
+                                <option value="shipped">Đang giao</option>
+                                <option value="completed">Đã hoàn thành</option>
+                                <option value="cancelled">Đã hủy</option>
+                                <option value="returned">Đã trả hàng</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold transition shadow-sm">
+                            <i class="bi bi-save me-2"></i> Lưu thay đổi
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .hover-shadow:hover {
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+            transform: translateY(-2px);
+        }
+        .transition {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+}
