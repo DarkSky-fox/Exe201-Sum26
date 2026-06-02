@@ -141,4 +141,39 @@ public class OrderService : IOrderService
         await _db.SaveChangesAsync(cancellationToken);
         return true;
     }
+
+    public async Task<Order?> GetOrderForSellerByProductIdAsync(int productId, int sellerId, CancellationToken cancellationToken = default)
+    {
+        return await _db.Orders
+            .Include(o => o.Product)
+                .ThenInclude(p => p.ProductImages)
+            .Include(o => o.Buyer)
+                .ThenInclude(b => b.UserAddresses)
+                    .ThenInclude(ua => ua.Area)
+            .Include(o => o.Shipment)
+                .ThenInclude(s => s.DeliveryAddress)
+                    .ThenInclude(da => da.Area)
+            .Include(o => o.Voucher)
+            .FirstOrDefaultAsync(o => o.ProductId == productId && o.SellerId == sellerId, cancellationToken);
+    }
+
+    public async Task<bool> UpdateOrderStatusAsync(int orderId, int sellerId, string newStatus, CancellationToken cancellationToken = default)
+    {
+        var order = await _db.Orders
+            .FirstOrDefaultAsync(o => o.OrderId == orderId && o.SellerId == sellerId, cancellationToken);
+
+        if (order is null)
+        {
+            return false;
+        }
+
+        order.OrderStatus = newStatus;
+        if (string.Equals(newStatus, "completed", StringComparison.OrdinalIgnoreCase))
+        {
+            order.CompletedAt = DateTime.Now;
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }

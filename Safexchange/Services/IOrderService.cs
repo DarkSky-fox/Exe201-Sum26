@@ -9,4 +9,6 @@ public interface IOrderService
     Task<List<Order>> CreateOrdersFromCartAsync(int buyerId, IReadOnlyList<CartItem> items, CancellationToken cancellationToken = default);
     Task<Order?> GetOrderForBuyerAsync(int orderId, int buyerId, CancellationToken cancellationToken = default);
     Task<bool> UpdateOrderAsync(int orderId, int buyerId, decimal shippingFee, string? voucherCode, CancellationToken cancellationToken = default);
+    Task<Order?> GetOrderForSellerByProductIdAsync(int productId, int sellerId, CancellationToken cancellationToken = default);
+    Task<bool> UpdateOrderStatusAsync(int orderId, int sellerId, string newStatus, CancellationToken cancellationToken = default);
 }
