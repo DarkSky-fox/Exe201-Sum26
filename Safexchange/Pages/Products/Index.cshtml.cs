@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
+using Safexchange.Services;
 
 namespace Safexchange.Pages.Products;
 
@@ -41,6 +42,19 @@ public class IndexModel : PageModel
                 .CategoryName;
         }
 
+        var displayStatusIds = (await _db.ProductStatuses
+                .AsNoTracking()
+                .Select(s => new ProductStatus
+                {
+                    StatusId = s.StatusId,
+                    StatusCode = s.StatusCode,
+                    StatusName = s.StatusName
+                })
+                .ToListAsync(cancellationToken))
+            .Where(ProductStatusHelper.IsDisplayStatus)
+            .Select(s => s.StatusId)
+            .ToList();
+
         var query = _db.Products
             .AsNoTracking()
             .Include(p => p.Category)
@@ -48,6 +62,15 @@ public class IndexModel : PageModel
             .Include(p => p.ProductImages)
             .Include(p => p.Seller)
             .AsQueryable();
+
+        if (displayStatusIds.Count > 0)
+        {
+            query = query.Where(p => displayStatusIds.Contains(p.StatusId));
+        }
+        else
+        {
+            query = query.Where(_ => false);
+        }
 
         if (!string.IsNullOrWhiteSpace(search))
         {

@@ -1,11 +1,10 @@
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
 using Safexchange.Services;
 
@@ -28,7 +27,7 @@ public class GoogleCallbackModel : PageModel
 
         if (!googleResult.Succeeded || googleResult.Principal == null)
         {
-            return RedirectToPage("/Login", new { message = "Google sign-in failed. Please try again." });
+            return RedirectToPage("/Login", new { message = "Đăng nhập Google thất bại. Vui lòng thử lại." });
         }
 
         var email = googleResult.Principal.FindFirstValue(ClaimTypes.Email)
@@ -36,14 +35,16 @@ public class GoogleCallbackModel : PageModel
 
         if (string.IsNullOrWhiteSpace(email))
         {
-            return RedirectToPage("/Login", new { message = "Google account has no email." });
+            return RedirectToPage("/Login", new { message = "Tài khoản Google không có email." });
         }
+
+        email = email.Trim().ToLowerInvariant();
 
         var fullName = googleResult.Principal.FindFirstValue(ClaimTypes.Name)
             ?? googleResult.Principal.FindFirstValue("name")
             ?? email.Split('@')[0];
 
-        var user = _context.Users.FirstOrDefault(u => u.Email == email);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
 
         if (user == null)
         {
@@ -51,14 +52,14 @@ public class GoogleCallbackModel : PageModel
             {
                 Email = email,
                 FullName = fullName,
-                PasswordHash = HashGooglePlaceholder(email),
+                PasswordHash = PasswordHasher.HashGooglePlaceholder(email),
                 Role = "student",
                 AccountStatus = "active",
                 CreatedAt = DateTime.Now
             };
 
             _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         var claims = new List<Claim>
@@ -72,9 +73,7 @@ public class GoogleCallbackModel : PageModel
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
         _currentUser.SetUserId(user.UserId);
 
@@ -84,12 +83,5 @@ public class GoogleCallbackModel : PageModel
         }
 
         return RedirectToPage("/Index");
-    }
-
-    private static string HashGooglePlaceholder(string email)
-    {
-        using var sha256 = SHA256.Create();
-        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes("GOOGLE_OAUTH:" + email));
-        return Convert.ToBase64String(bytes);
     }
 }
