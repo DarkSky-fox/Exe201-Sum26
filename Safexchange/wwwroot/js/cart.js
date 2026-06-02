@@ -5,8 +5,36 @@ const Cart = (function () {
         return bootstrap.Modal.getOrCreateInstance(document.getElementById('cartViewModal'));
     }
 
-    function getEditModal() {
-        return bootstrap.Modal.getOrCreateInstance(document.getElementById('cartEditModal'));
+    function showToast(message, isError) {
+        const toastEl = document.getElementById('cart-toast');
+        const bodyEl = document.getElementById('cart-toast-body');
+        if (!toastEl || !bodyEl) {
+            alert(message);
+            return;
+        }
+
+        bodyEl.textContent = message;
+        toastEl.classList.remove('text-bg-success', 'text-bg-danger');
+        toastEl.classList.add(isError ? 'text-bg-danger' : 'text-bg-success');
+        bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2800 }).show();
+    }
+
+    function parseJsonResponse(response) {
+        const contentType = response.headers.get('content-type') || '';
+        if (!response.ok) {
+            if (contentType.includes('application/json')) {
+                return response.json().then(data => {
+                    throw new Error(data.message || `Yêu cầu thất bại (${response.status}).`);
+                });
+            }
+            throw new Error(`Yêu cầu thất bại (${response.status}). Vui lòng đăng nhập và thử lại.`);
+        }
+
+        if (contentType.includes('application/json')) {
+            return response.json();
+        }
+
+        throw new Error('Phản hồi không hợp lệ từ máy chủ.');
     }
 
     function loadPartial(url, targetId) {
@@ -79,57 +107,29 @@ const Cart = (function () {
             .then(() => getViewModal().show());
     }
 
-    function openEdit() {
-        const viewEl = document.getElementById('cartViewModal');
-        const viewInstance = bootstrap.Modal.getInstance(viewEl);
-        if (viewInstance) viewInstance.hide();
-
-        loadPartial(`${baseUrl}?handler=Edit`, 'cart-edit-body')
-            .then(() => getEditModal().show());
-    }
-
-    function saveEdit(event) {
-        event.preventDefault();
-        const inputs = document.querySelectorAll('.cart-qty-input');
-        const updates = Array.from(inputs).map(input => {
-            const productId = parseInt(input.dataset.productId, 10);
-            const quantity = parseInt(input.value, 10) || 0;
-            return updateItem(productId, quantity);
-        });
-
-        Promise.all(updates).then(() => {
-            getEditModal().hide();
-            openView();
-            refreshBadge();
-        });
-    }
-
-    function updateItem(productId, quantity) {
-        const body = new URLSearchParams();
-        body.append('productId', productId);
-        body.append('quantity', quantity);
-
-        return fetch(`${baseUrl}?handler=Update`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: body.toString()
-        }).then(r => r.json());
-    }
-
     function removeItem(productId) {
+        if (!confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
+            return;
+        }
+
         const body = new URLSearchParams();
         body.append('productId', productId);
 
         fetch(`${baseUrl}?handler=Remove`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: body.toString()
         })
-            .then(r => r.json())
+            .then(r => parseJsonResponse(r))
             .then(() => {
-                openEdit();
+                openView();
                 refreshBadge();
-            });
+                showToast('Đã xóa sản phẩm khỏi giỏ.', false);
+            })
+            .catch(err => showToast(err.message || 'Không thể xóa sản phẩm.', true));
     }
 
     function goToCheckout() {
@@ -144,44 +144,79 @@ const Cart = (function () {
 
         fetch(`${baseUrl}?handler=PrepareCheckout`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: body.toString()
         })
-            .then(r => r.json())
+            .then(r => parseJsonResponse(r))
             .then(data => {
                 if (!data.success) {
                     if (data.redirectUrl && data.redirectUrl.includes('Login')) {
                         window.location.href = '/Login';
                         return;
                     }
-                    alert(data.message || 'Không thể chuyển sang thanh toán.');
+                    showToast(data.message || 'Không thể chuyển sang thanh toán.', true);
+                    if (data.message) {
+                        openView();
+                        refreshBadge();
+                    }
                     return;
                 }
                 getViewModal().hide();
                 window.location.href = data.redirectUrl;
             })
-            .catch(() => alert('Không thể chuyển sang thanh toán. Vui lòng đăng nhập.'));
+            .catch(() => showToast('Không thể chuyển sang thanh toán. Vui lòng đăng nhập.', true));
     }
 
-    function prepareCheckout(productIds) {
+    function add(productId) {
         const body = new URLSearchParams();
-        productIds.forEach(id => body.append('productIds', id));
+        body.append('productId', productId);
 
-        return fetch(`${baseUrl}?handler=PrepareCheckout`, {
+        return fetch(`${baseUrl}?handler=Add`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: body.toString()
-        }).then(r => r.json());
+        })
+            .then(r => parseJsonResponse(r))
+            .then(data => {
+                if (!data.success) {
+                    if (data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                        return data;
+                    }
+                    showToast(data.message || 'Không thể thêm vào giỏ.', true);
+                    return data;
+                }
+
+                if (typeof data.cartCount === 'number') {
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) {
+                        badge.textContent = data.cartCount;
+                        badge.style.display = data.cartCount > 0 ? 'inline-block' : 'none';
+                    }
+                } else {
+                    refreshBadge();
+                }
+
+                showToast(data.message || 'Đã thêm vào giỏ hàng.', false);
+                return data;
+            })
+            .catch(err => {
+                showToast(err.message || 'Không thể thêm vào giỏ hàng.', true);
+            });
     }
 
     return {
         openView,
-        openEdit,
-        saveEdit,
         removeItem,
         goToCheckout,
-        prepareCheckout,
         toggleSelectAll,
-        refreshBadge
+        refreshBadge,
+        add
     };
 })();

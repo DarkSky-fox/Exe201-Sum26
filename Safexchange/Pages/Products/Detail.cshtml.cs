@@ -11,17 +11,24 @@ public class DetailModel : PageModel
 {
     private readonly SafexchangeDbContext _db;
     private readonly ICartService _cart;
+    private readonly ICartAddService _cartAdd;
     private readonly ICurrentUserService _currentUser;
 
-    public DetailModel(SafexchangeDbContext db, ICartService cart, ICurrentUserService currentUser)
+    public DetailModel(
+        SafexchangeDbContext db,
+        ICartService cart,
+        ICartAddService cartAdd,
+        ICurrentUserService currentUser)
     {
         _db = db;
         _cart = cart;
+        _cartAdd = cartAdd;
         _currentUser = currentUser;
     }
 
     public Product? Product { get; private set; }
     public string? CoverImageUrl { get; private set; }
+    public bool IsAvailableForPurchase { get; private set; } = true;
 
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
@@ -44,6 +51,8 @@ public class DetailModel : PageModel
             .Select(i => i.ImageUrl)
             .FirstOrDefault();
 
+        IsAvailableForPurchase = ProductStatusHelper.IsDisplayStatus(Product.Status);
+
         Product.ViewCount++;
         await _db.SaveChangesAsync(cancellationToken);
 
@@ -52,26 +61,42 @@ public class DetailModel : PageModel
 
     public async Task<IActionResult> OnPostAddToCartAsync(int id, int quantity = 1)
     {
-        var (success, message) = await TryAddToCartAsync(id, quantity);
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            return new JsonResult(new
+            {
+                success = false,
+                message = "Vui lòng đăng nhập để thêm vào giỏ.",
+                redirectUrl = "/Login"
+            });
+        }
+
+        var result = await _cartAdd.AddProductAsync(_currentUser.GetUserId(), id, quantity);
         return new JsonResult(new
         {
-            success,
-            message,
-            cartCount = _cart.GetItemCount()
+            success = result.Success,
+            message = result.Message,
+            cartCount = result.CartCount,
+            redirectUrl = result.RedirectUrl
         });
     }
 
     public async Task<IActionResult> OnPostBuyNowAsync(int id, int quantity = 1)
     {
-        if (!User.Identity?.IsAuthenticated == true)
+        if (User.Identity?.IsAuthenticated != true)
         {
             return new JsonResult(new { success = false, message = "Vui lòng đăng nhập để mua hàng.", redirectUrl = "/Login" });
         }
 
-        var (success, message) = await TryAddToCartAsync(id, quantity);
-        if (!success)
+        var result = await _cartAdd.AddProductAsync(_currentUser.GetUserId(), id, quantity);
+        if (!result.Success)
         {
-            return new JsonResult(new { success, message, cartCount = _cart.GetItemCount() });
+            return new JsonResult(new
+            {
+                success = result.Success,
+                message = result.Message,
+                cartCount = result.CartCount
+            });
         }
 
         _cart.SetCheckoutProductIds(new[] { id });
@@ -80,43 +105,8 @@ public class DetailModel : PageModel
         {
             success = true,
             message = "Chuyển đến trang thanh toán...",
-            cartCount = _cart.GetItemCount(),
+            cartCount = result.CartCount,
             redirectUrl = Url.Page("/Checkout/Index")
         });
-    }
-
-    private async Task<(bool Success, string Message)> TryAddToCartAsync(int id, int quantity)
-    {
-        var product = await _db.Products
-            .Include(p => p.ProductImages)
-            .FirstOrDefaultAsync(p => p.ProductId == id);
-
-        if (product is null)
-        {
-            return (false, "Sản phẩm không tồn tại.");
-        }
-
-        if (product.SellerId == _currentUser.GetUserId())
-        {
-            return (false, "Bạn không thể mua sản phẩm của chính mình.");
-        }
-
-        var imageUrl = product.ProductImages
-            .OrderByDescending(i => i.IsCover)
-            .ThenBy(i => i.SortOrder)
-            .Select(i => i.ImageUrl)
-            .FirstOrDefault();
-
-        _cart.AddItem(new CartItem
-        {
-            ProductId = product.ProductId,
-            SellerId = product.SellerId,
-            Title = product.Title,
-            ImageUrl = imageUrl,
-            UnitPrice = product.Price,
-            Quantity = Math.Max(1, quantity)
-        });
-
-        return (true, "Đã thêm vào giỏ hàng.");
     }
 }

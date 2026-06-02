@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
 using Safexchange.Pages.Shared;
+using Safexchange.Services;
 
 namespace Safexchange.Pages;
 
@@ -22,6 +23,7 @@ public class IndexModel : PageModel
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var now = DateTime.Now;
+        var displayStatusIds = await GetDisplayStatusIdsAsync(cancellationToken);
 
         Categories = await _db.Categories
             .AsNoTracking()
@@ -36,7 +38,7 @@ public class IndexModel : PageModel
             .ToListAsync(cancellationToken);
 
         Products = await LoadProductsAsync(
-            _db.Products.AsNoTracking(),
+            _db.Products.AsNoTracking().Where(p => displayStatusIds.Contains(p.StatusId)),
             take: 12,
             cancellationToken);
 
@@ -51,17 +53,20 @@ public class IndexModel : PageModel
             promotedQuery.Where(pl =>
                 pl.PromotionType == "combo_featured" || pl.PromotionType == "featured"),
             take: 6,
+            displayStatusIds,
             cancellationToken);
 
         SponsoredProducts = await LoadPromotedProductsAsync(
             promotedQuery.Where(pl => pl.PromotionType == "boost"),
             take: 6,
+            displayStatusIds,
             cancellationToken);
     }
 
     private async Task<List<ProductListItem>> LoadPromotedProductsAsync(
         IQueryable<PromotionList> query,
         int take,
+        List<int> displayStatusIds,
         CancellationToken cancellationToken)
     {
         var productIds = await query
@@ -78,12 +83,28 @@ public class IndexModel : PageModel
         }
 
         var products = await LoadProductsAsync(
-            _db.Products.AsNoTracking().Where(p => productIds.Contains(p.ProductId)),
+            _db.Products.AsNoTracking()
+                .Where(p => productIds.Contains(p.ProductId))
+                .Where(p => displayStatusIds.Contains(p.StatusId)),
             take: productIds.Count,
             cancellationToken);
 
         return productIds
-            .Select(id => products.First(p => p.ProductId == id))
+            .Select(id => products.FirstOrDefault(p => p.ProductId == id))
+            .Where(p => p is not null)
+            .Cast<ProductListItem>()
+            .ToList();
+    }
+
+    private async Task<List<int>> GetDisplayStatusIdsAsync(CancellationToken cancellationToken)
+    {
+        var statuses = await _db.ProductStatuses
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return statuses
+            .Where(ProductStatusHelper.IsDisplayStatus)
+            .Select(s => s.StatusId)
             .ToList();
     }
 

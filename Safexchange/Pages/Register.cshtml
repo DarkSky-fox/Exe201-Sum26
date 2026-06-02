@@ -52,21 +52,24 @@
                 </p>
 
                 <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
 
                     <div class="input-group">
-                        <label>Full Name</label>
+                        <label asp-for="Input.FullName">Full Name</label>
 
                         <input asp-for="Input.FullName"
                                class="custom-input"
                                placeholder="Enter your full name" />
+                        <span asp-validation-for="Input.FullName" class="text-danger small"></span>
                     </div>
 
                     <div class="input-group">
-                        <label>Email</label>
+                        <label asp-for="Input.Email">Email</label>
 
                         <input asp-for="Input.Email"
                                class="custom-input"
                                placeholder="Enter your email" />
+                        <span asp-validation-for="Input.Email" class="text-danger small"></span>
                     </div>
 
                     <div class="input-group">
@@ -79,16 +82,19 @@
                     </div>
 
                     <div class="input-group">
-                        <label>Phone</label>
+                        <label asp-for="Input.Phone">Phone</label>
 
                         <input asp-for="Input.Phone"
                                class="custom-input"
-                               placeholder="Enter phone number" />
+                               placeholder="0912345678"
+                               inputmode="tel"
+                               autocomplete="tel" />
+                        <span asp-validation-for="Input.Phone" class="text-danger small"></span>
                     </div>
 
                     <div class="input-group">
 
-                        <label>Year Level</label>
+                        <label asp-for="Input.YearLevel">Year Level</label>
 
                         <select asp-for="Input.YearLevel"
                                 class="custom-input">
@@ -101,6 +107,7 @@
                             <option value="graduated">Graduated</option>
 
                         </select>
+                        <span asp-validation-for="Input.YearLevel" class="text-danger small"></span>
 
                     </div>
 
@@ -347,3 +354,7 @@
     }
 
 </style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

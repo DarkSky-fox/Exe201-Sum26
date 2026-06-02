@@ -26,24 +26,17 @@ namespace Safexchange
             builder.Services
                 .AddAuthentication(options =>
                 {
-                    options.DefaultScheme =
-                        CookieAuthenticationDefaults.AuthenticationScheme;
-
-                    options.DefaultChallengeScheme =
-                        GoogleDefaults.AuthenticationScheme;
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
-
-                // COOKIE LOGIN
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/Login";
-
                     options.AccessDeniedPath = "/AccessDenied";
-
                     options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 })
-
-                // GOOGLE LOGIN
                 .AddGoogle(options =>
                 {
                     options.ClientId =
@@ -91,6 +84,7 @@ namespace Safexchange
             // CUSTOM SERVICES
             // =========================================
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ICartAddService, CartAddService>();
 
             builder.Services.AddScoped<IOrderService, OrderService>();
 

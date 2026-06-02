@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Safexchange.Models;
 using Safexchange.Services;
+using Safexchange.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace Safexchange.Pages.Checkout;
@@ -62,6 +63,15 @@ public class IndexModel : PageModel
             return Page();
         }
 
+        var normalizedPhone = VietnamesePhoneAttribute.Normalize(Form.Phone);
+        if (normalizedPhone is null)
+        {
+            ModelState.AddModelError(nameof(Form.Phone), "Số điện thoại không hợp lệ. Vui lòng nhập số Việt Nam (vd: 0912345678).");
+            return Page();
+        }
+
+        Form.Phone = normalizedPhone;
+
         var buyerId = _currentUser.GetUserId();
         var result = await _checkout.PlaceOrderAsync(new CheckoutInput
         {
@@ -75,11 +85,30 @@ public class IndexModel : PageModel
 
         if (!result.Success)
         {
+            if (result.UnavailableProductIds.Count > 0)
+            {
+                _cart.RemoveItems(result.UnavailableProductIds);
+                _cart.ClearCheckoutProductIds();
+            }
+
             ModelState.AddModelError(string.Empty, result.Message);
             return Page();
         }
 
-        var productIds = Items.Select(i => i.ProductId).ToList();
+        var productIds = result.OrderIds.Any()
+            ? await _db.Orders
+                .AsNoTracking()
+                .Where(o => result.OrderIds.Contains(o.OrderId))
+                .Select(o => o.ProductId)
+                .Distinct()
+                .ToListAsync(cancellationToken)
+            : Items.Select(i => i.ProductId).ToList();
+
+        if (result.UnavailableProductIds.Count > 0)
+        {
+            productIds.AddRange(result.UnavailableProductIds);
+        }
+
         _cart.RemoveItems(productIds);
         _cart.ClearCheckoutProductIds();
 
@@ -145,7 +174,7 @@ public class IndexModel : PageModel
         public string ReceiverName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
-        [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
+        [VietnamesePhone]
         [Display(Name = "Số điện thoại")]
         public string Phone { get; set; } = string.Empty;
 

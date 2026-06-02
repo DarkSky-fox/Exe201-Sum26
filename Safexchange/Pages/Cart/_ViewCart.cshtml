@@ -21,6 +21,7 @@ else
                     <th class="text-end">Đơn giá</th>
                     <th class="text-center">SL</th>
                     <th class="text-end">Tạm tính</th>
+                    <th style="width:48px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -43,6 +44,14 @@ else
                         <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
                         <td class="text-center">@item.Quantity</td>
                         <td class="text-end fw-semibold">@item.LineTotal.ToString("N0") đ</td>
+                        <td class="text-end">
+                            <button type="button"
+                                    class="btn btn-outline-danger btn-sm"
+                                    title="Xóa khỏi giỏ"
+                                    onclick="Cart.removeItem(@item.ProductId)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -53,9 +62,6 @@ else
             <div class="small text-muted">Đã chọn: <span id="cart-selected-count">@Model.Items.Count</span> sản phẩm</div>
             <strong>Tạm tính: <span id="cart-selected-total">@Model.Total.ToString("N0")</span> đ</strong>
         </div>
-        <div class="btn-group">
-            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="Cart.openEdit()">Chỉnh sửa giỏ</button>
-            <button type="button" class="btn btn-primary btn-sm" onclick="Cart.goToCheckout()">Thanh toán</button>
-        </div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="Cart.goToCheckout()">Thanh toán</button>
     </div>
 }

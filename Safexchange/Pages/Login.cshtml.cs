@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -5,96 +6,96 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Safexchange.Models;
 using Safexchange.Services;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+namespace Safexchange.Pages;
 
-namespace Safexchange.Pages
+public class LoginModel : PageModel
 {
-    public class LoginModel : PageModel
+    private readonly SafexchangeDbContext _context;
+    private readonly ICurrentUserService _currentUser;
+
+    public LoginModel(SafexchangeDbContext context, ICurrentUserService currentUser)
     {
-        private readonly SafexchangeDbContext _context;
-        private readonly ICurrentUserService _currentUser;
+        _context = context;
+        _currentUser = currentUser;
+    }
 
-        public LoginModel(SafexchangeDbContext context, ICurrentUserService currentUser)
+    [BindProperty]
+    public LoginForm Input { get; set; } = new();
+
+    public string? Message { get; set; }
+
+    public void OnGet(string? message)
+    {
+        if (!string.IsNullOrWhiteSpace(message))
         {
-            _context = context;
-            _currentUser = currentUser;
+            Message = message;
+        }
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
         }
 
-        [BindProperty]
-        public string Email { get; set; }
+        var email = Input.Email.Trim().ToLowerInvariant();
+        var user = _context.Users.FirstOrDefault(x => x.Email.ToLower() == email);
 
-        [BindProperty]
-        public string Password { get; set; }
-
-        public string Message { get; set; }
-
-        public void OnGet(string? message)
+        if (user is null)
         {
-            if (!string.IsNullOrWhiteSpace(message))
-            {
-                Message = message;
-            }
+            Message = "Email hoặc mật khẩu không đúng.";
+            return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        if (PasswordHasher.IsGoogleAccount(email, user.PasswordHash))
         {
-            // HASH PASSWORD
-            string hashedPassword = HashPassword(Password);
-
-            // CHECK USER
-            var user = _context.Users.FirstOrDefault(x =>
-                x.Email == Email &&
-                x.PasswordHash == hashedPassword);
-
-            if (user == null)
-            {
-                Message = "Invalid Email or Password!";
-                return Page();
-            }
-
-            // CLAIMS
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role),
-                new Claim("UserId", user.UserId.ToString())
-            };
-
-            // IDENTITY
-            var identity = new ClaimsIdentity(
-                claims,
-                CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // PRINCIPAL
-            var principal = new ClaimsPrincipal(identity);
-
-            // SIGN IN
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal);
-
-            _currentUser.SetUserId(user.UserId);
-
-            if (string.Equals(user.Role, "shipper", StringComparison.OrdinalIgnoreCase))
-            {
-                return RedirectToPage("/Shipper/Index");
-            }
-
-            return RedirectToPage("/Index");
+            Message = "Tài khoản này đăng ký bằng Google. Vui lòng dùng nút Continue with Google.";
+            return Page();
         }
 
-        // HASH PASSWORD
-        private string HashPassword(string password)
+        if (user.PasswordHash != PasswordHasher.HashPassword(Input.Password))
         {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] bytes = sha256.ComputeHash(
-                    Encoding.UTF8.GetBytes(password));
-
-                return Convert.ToBase64String(bytes);
-            }
+            Message = "Email hoặc mật khẩu không đúng.";
+            return Page();
         }
+
+        await SignInUserAsync(user);
+
+        if (string.Equals(user.Role, "shipper", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToPage("/Shipper/Index");
+        }
+
+        return RedirectToPage("/Index");
+    }
+
+    private async Task SignInUserAsync(User user)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, user.FullName),
+            new(ClaimTypes.Email, user.Email),
+            new(ClaimTypes.Role, user.Role),
+            new("UserId", user.UserId.ToString())
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+        _currentUser.SetUserId(user.UserId);
+    }
+
+    public class LoginForm
+    {
+        [Required(ErrorMessage = "Vui lòng nhập email.")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
+        [Display(Name = "Mật khẩu")]
+        public string Password { get; set; } = string.Empty;
     }
 }

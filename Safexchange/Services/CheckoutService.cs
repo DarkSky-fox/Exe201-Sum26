@@ -85,7 +85,24 @@ public class CheckoutService : ICheckoutService
             cancellationToken);
 
         var orderIds = new List<int>();
+        var unavailableProductIds = new List<int>();
+        var unavailableProductTitles = new List<string>();
         var now = DateTime.Now;
+
+        var statuses = await _db.ProductStatuses.AsNoTracking().ToListAsync(cancellationToken);
+        var displayStatusId = statuses.FirstOrDefault(ProductStatusHelper.IsDisplayStatus)?.StatusId;
+        var soldStatusId = statuses.FirstOrDefault(ProductStatusHelper.IsSoldStatus)?.StatusId;
+
+        if (!displayStatusId.HasValue || !soldStatusId.HasValue)
+        {
+            return new CheckoutResult
+            {
+                Success = false,
+                Message = "Thiếu trạng thái sản phẩm để xử lý thanh toán (Đang hiển thị/Đã bán)."
+            };
+        }
+
+        await using var transaction = await _db.Database.BeginTransactionAsync(cancellationToken);
 
         foreach (var item in input.Items)
         {
@@ -95,6 +112,18 @@ public class CheckoutService : ICheckoutService
 
             if (product is null || product.SellerId == input.BuyerId)
             {
+                continue;
+            }
+
+            var markedSold = await _db.Products
+                .Where(p => p.ProductId == item.ProductId && p.StatusId == displayStatusId.Value)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(p => p.StatusId, soldStatusId.Value), cancellationToken);
+
+            if (markedSold == 0)
+            {
+                unavailableProductIds.Add(item.ProductId);
+                unavailableProductTitles.Add(product.Title);
                 continue;
             }
 
@@ -150,20 +179,30 @@ public class CheckoutService : ICheckoutService
 
         if (orderIds.Count == 0)
         {
+            await transaction.RollbackAsync(cancellationToken);
             return new CheckoutResult
             {
                 Success = false,
-                Message = "Không thể tạo đơn hàng. Kiểm tra lại sản phẩm trong giỏ."
+                Message = unavailableProductTitles.Count > 0
+                    ? $"Sản phẩm đã không còn khả dụng: {string.Join(", ", unavailableProductTitles)}."
+                    : "Không thể tạo đơn hàng. Kiểm tra lại sản phẩm trong giỏ.",
+                UnavailableProductIds = unavailableProductIds,
+                UnavailableProductTitles = unavailableProductTitles
             };
         }
 
         await _db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
 
         return new CheckoutResult
         {
             Success = true,
-            Message = $"Đặt hàng thành công {orderIds.Count} đơn.",
-            OrderIds = orderIds
+            Message = unavailableProductTitles.Count > 0
+                ? $"Đặt hàng thành công {orderIds.Count} đơn. Một số sản phẩm đã được người khác mua trước: {string.Join(", ", unavailableProductTitles)}."
+                : $"Đặt hàng thành công {orderIds.Count} đơn.",
+            OrderIds = orderIds,
+            UnavailableProductIds = unavailableProductIds,
+            UnavailableProductTitles = unavailableProductTitles
         };
     }
 

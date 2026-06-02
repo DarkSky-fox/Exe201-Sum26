@@ -1,3 +1,10 @@
+<div id="cart-toast" class="toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert" aria-live="polite" aria-atomic="true" style="z-index: 1100;">
+    <div class="d-flex">
+        <div class="toast-body" id="cart-toast-body">Đã thêm vào giỏ hàng.</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Đóng"></button>
+    </div>
+</div>
+
 <!-- Modal xem giỏ hàng -->
 <div class="modal fade" id="cartViewModal" tabindex="-1" aria-labelledby="cartViewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -7,21 +14,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <div class="modal-body" id="cart-view-body">
-                <div class="text-center text-muted py-4">Đang tải...</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal chỉnh sửa giỏ hàng -->
-<div class="modal fade" id="cartEditModal" tabindex="-1" aria-labelledby="cartEditModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cartEditModalLabel">Chỉnh sửa giỏ hàng</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-            </div>
-            <div class="modal-body" id="cart-edit-body">
                 <div class="text-center text-muted py-4">Đang tải...</div>
             </div>
         </div>
