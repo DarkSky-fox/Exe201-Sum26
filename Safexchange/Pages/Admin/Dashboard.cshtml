@@ -2,41 +2,597 @@
 @model Safexchange.Pages.Admin.DashboardModel
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Dashboard Quản trị";
 }
 
-<div class="container-fluid">
+<div class="dashboard-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Dashboard Thống Kê</h2>
-        <a asp-page="/Index" class="btn btn-outline-secondary">
-            <i class="bi bi-house-door"></i> Quay về trang chủ
-        </a>
+        <h2 class="mb-0">
+            <i class="bi bi-speedometer2 me-2"></i>Dashboard Thống kê
+        </h2>
+        <span class="text-muted">Cập nhật: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
     </div>
 
-    <div class="row">
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">@Model.TotalProducts</span>
+                    <span class="stat-label">Tổng sản phẩm</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">@Model.TotalUsers</span>
+                    <span class="stat-label">Người dùng</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">@Model.TotalOrders</span>
+                    <span class="stat-label">Đơn hàng</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon danger">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">@Model.PendingVerifications</span>
+                    <span class="stat-label">Chờ xác thực</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary Stats -->
+    <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng số sản phẩm</h5>
-                    <p class="card-text fs-2">--</p>
+            <div class="stat-card">
+                <div class="stat-icon info">
+                    <i class="bi bi-eye"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">@Model.ActiveProducts</span>
+                    <span class="stat-label">Đang hiển thị</span>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Người dùng mới</h5>
-                    <p class="card-text fs-2">--</p>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="bi bi-bag-check"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">@Model.SoldProducts</span>
+                    <span class="stat-label">Đã bán</span>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Yêu cầu mượn sách</h5>
-                    <p class="card-text fs-2">--</p>
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value">@Model.TotalRevenue.ToString("N0") đ</span>
+                    <span class="stat-label">Doanh thu</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row g-4 mb-4">
+        <!-- Revenue Chart -->
+        <div class="col-lg-8">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5><i class="bi bi-graph-up-arrow me-2"></i>Doanh thu & Đơn hàng theo tháng</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status Pie Chart -->
+        <div class="col-lg-4">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5><i class="bi bi-pie-chart me-2"></i>Tỷ lệ trạng thái đơn hàng</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row Charts -->
+    <div class="row g-4 mb-4">
+        <!-- Category Distribution -->
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5><i class="bi bi-grid-3x3-gap me-2"></i>Phân bố sản phẩm theo danh mục</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Role Distribution -->
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5><i class="bi bi-person-badge me-2"></i>Phân bố người dùng theo vai trò</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="userRoleChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h5 class="card-title">
+                    <i class="bi bi-lightning me-2"></i>Thao tác nhanh
+                </h5>
+                <div class="quick-actions">
+                    <a asp-page="UserManagement/Index" class="quick-action-btn">
+                        <i class="bi bi-people"></i>
+                        <span>Quản lý người dùng</span>
+                    </a>
+                    <a asp-page="UserManagement/Verify" class="quick-action-btn">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Xác thực tài khoản</span>
+                        @if (Model.PendingVerifications > 0)
+                        {
+                            <span class="badge bg-danger">@Model.PendingVerifications</span>
+                        }
+                    </a>
+                    <a asp-page="/Index" class="quick-action-btn">
+                        <i class="bi bi-house"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h5 class="card-title">
+                    <i class="bi bi-graph-up me-2"></i>Tổng quan
+                </h5>
+                <div class="overview-info">
+                    <div class="overview-item">
+                        <span class="label">Tỷ lệ sản phẩm đã bán:</span>
+                        <span class="value">@(Model.TotalProducts > 0 ? Math.Round((double)Model.SoldProducts / Model.TotalProducts * 100, 1) : 0)%</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="label">Sản phẩm trung bình/người dùng:</span>
+                        <span class="value">@(Model.TotalUsers > 0 ? Math.Round((double)Model.TotalProducts / Model.TotalUsers, 1) : 0)</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Chart colors
+        const colors = {
+            primary: 'rgba(99, 102, 241, 1)',
+            primaryBg: 'rgba(99, 102, 241, 0.1)',
+            success: 'rgba(16, 185, 129, 1)',
+            successBg: 'rgba(16, 185, 129, 0.1)',
+            warning: 'rgba(245, 158, 11, 1)',
+            warningBg: 'rgba(245, 158, 11, 0.1)',
+            danger: 'rgba(239, 68, 68, 1)',
+            dangerBg: 'rgba(239, 68, 68, 0.1)',
+            info: 'rgba(59, 130, 246, 1)',
+            infoBg: 'rgba(59, 130, 246, 0.1)',
+            purple: 'rgba(139, 92, 246, 1)',
+            purpleBg: 'rgba(139, 92, 246, 0.1)',
+            teal: 'rgba(20, 184, 166, 1)',
+            tealBg: 'rgba(20, 184, 166, 0.1)'
+        };
+
+        // Revenue & Orders Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.MonthLabels)),
+                datasets: [
+                    {
+                        label: 'Doanh thu (VNĐ)',
+                        data: @Html.Raw(Json.Serialize(Model.MonthlyRevenue)),
+                        backgroundColor: colors.primaryBg,
+                        borderColor: colors.primary,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Số đơn hàng',
+                        data: @Html.Raw(Json.Serialize(Model.MonthlyOrders)),
+                        type: 'line',
+                        borderColor: colors.success,
+                        backgroundColor: colors.successBg,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: colors.success,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Doanh thu (VNĐ)'
+                        },
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Số đơn hàng'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Order Status Pie Chart
+        const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+        new Chart(orderStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.OrderStatusLabels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.OrderStatusCounts)),
+                    backgroundColor: [
+                        colors.primary,
+                        colors.success,
+                        colors.warning,
+                        colors.danger,
+                        colors.info,
+                        colors.purple
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+
+        // Category Distribution Bar Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.CategoryLabels)),
+                datasets: [{
+                    label: 'Số sản phẩm',
+                    data: @Html.Raw(Json.Serialize(Model.CategoryProductCounts)),
+                    backgroundColor: [
+                        colors.primary,
+                        colors.success,
+                        colors.warning,
+                        colors.info,
+                        colors.purple,
+                        colors.teal,
+                        colors.danger
+                    ],
+                    borderRadius: 8,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // User Role Pie Chart
+        const userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
+        new Chart(userRoleCtx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.RoleLabels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.RoleCounts)),
+                    backgroundColor: [
+                        colors.primary,
+                        colors.success,
+                        colors.warning,
+                        colors.danger,
+                        colors.info,
+                        colors.purple
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+<style>
+    .dashboard-container {
+        padding: 1.5rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+    }
+
+    .stat-icon.primary {
+        background: rgba(99, 102, 241, 0.1);
+        color: #6366f1;
+    }
+
+    .stat-icon.success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .stat-icon.warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .stat-icon.danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .stat-icon.info {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    .stat-icon.purple {
+        background: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
+    }
+
+    .stat-icon.teal {
+        background: rgba(20, 184, 166, 0.1);
+        color: #14b8a6;
+    }
+
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+        height: 100%;
+    }
+
+    .chart-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .chart-header h5 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+    }
+
+    .chart-header h5 i {
+        color: var(--primary);
+    }
+
+    .chart-body {
+        padding: 1.25rem;
+        height: 300px;
+    }
+
+    .dashboard-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+    }
+
+    .dashboard-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+    }
+
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        color: var(--gray-700);
+        transition: all 0.2s;
+    }
+
+    .quick-action-btn:hover {
+        background: var(--primary-bg);
+        color: var(--primary);
+    }
+
+    .quick-action-btn i {
+        font-size: 1.25rem;
+    }
+
+    .quick-action-btn span {
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .overview-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .overview-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-md);
+    }
+
+    .overview-item .label {
+        color: var(--gray-600);
+    }
+
+    .overview-item .value {
+        font-weight: 600;
+        color: var(--primary);
+    }
+</style>

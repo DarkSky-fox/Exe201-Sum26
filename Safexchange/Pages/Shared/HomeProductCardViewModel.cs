@@ -13,6 +13,7 @@ public class HomeProductCardViewModel
     public bool ShowCartActions { get; set; }
     public bool CartIconOnly { get; set; }
     public bool IsAuthenticated { get; set; }
+    public bool IsFavourited { get; set; }
 
     public static HomeProductCardViewModel FromListItem(
         int productId,
@@ -25,7 +26,8 @@ public class HomeProductCardViewModel
         HomeProductCardVariant variant,
         bool isAuthenticated,
         bool showCartActions = false,
-        bool cartIconOnly = false) =>
+        bool cartIconOnly = false,
+        bool isFavourited = false) =>
         new()
         {
             ProductId = productId,
@@ -38,7 +40,8 @@ public class HomeProductCardViewModel
             Variant = variant,
             IsAuthenticated = isAuthenticated,
             ShowCartActions = showCartActions,
-            CartIconOnly = cartIconOnly
+            CartIconOnly = cartIconOnly,
+            IsFavourited = isFavourited
         };
 
     public string? ResolvedImageUrl

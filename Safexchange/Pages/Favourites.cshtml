@@ -1,0 +1,327 @@
+@page
+@model Safexchange.Pages.FavouritesModel
+@{
+    ViewData["Title"] = "Sản phẩm yêu thích";
+}
+
+<div class="favourites-page">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="bi bi-heart-fill me-2"></i>Sản phẩm yêu thích
+        </h1>
+        <p class="page-subtitle">Quản lý danh sách sản phẩm bạn đã lưu</p>
+    </div>
+
+    @if (!Model.FavouriteProducts.Any())
+    {
+        <div class="empty-state-card">
+            <div class="empty-icon">
+                <i class="bi bi-heart"></i>
+            </div>
+            <h4>Bạn chưa có sản phẩm yêu thích</h4>
+            <p>Khám phá và thêm các sản phẩm bạn thích vào danh sách</p>
+            <a asp-page="/Products/Index" class="btn btn-primary btn-lg">
+                <i class="bi bi-bag me-2"></i>Khám phá sản phẩm
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="favourites-info">
+            <span class="count-badge">@Model.FavouriteProducts.Count sản phẩm</span>
+        </div>
+        
+        <div class="products-grid">
+            @foreach (var product in Model.FavouriteProducts)
+            {
+                <div class="product-card">
+                    <div class="product-image">
+                        @{
+                            var coverImage = product.ProductImages.FirstOrDefault(i => i.IsCover)?.ImageUrl 
+                                ?? product.ProductImages.OrderBy(i => i.SortOrder).FirstOrDefault()?.ImageUrl;
+                        }
+                        @if (!string.IsNullOrEmpty(coverImage))
+                        {
+                            <img src="@coverImage" alt="@product.Title" />
+                        }
+                        else
+                        {
+                            <div class="placeholder-image">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        }
+                        <span class="product-status @product.Status?.StatusName.ToLower().Replace(" ", "-")">
+                            @product.Status?.StatusName
+                        </span>
+                        <form method="post" asp-page-handler="Remove" class="remove-form">
+                            <input type="hidden" name="productId" value="@product.ProductId" />
+                            <button type="submit" class="remove-btn" title="Xóa khỏi yêu thích">
+                                <i class="bi bi-heart-fill"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-meta">
+                            <span class="product-category">
+                                <i class="bi bi-grid-3x3-gap"></i>@product.Category?.CategoryName
+                            </span>
+                            <span class="product-condition">
+                                @product.ConditionStatus
+                            </span>
+                        </div>
+                        <h5 class="product-title">@product.Title</h5>
+                        <div class="product-price">
+                            <span class="price-value">@product.Price.ToString("N0")</span>
+                            <span class="price-currency">đ</span>
+                        </div>
+                        <div class="product-actions">
+                            <a asp-page="/Products/Detail" asp-route-id="@product.ProductId" class="btn btn-primary btn-sm flex-fill">
+                                <i class="bi bi-eye me-1"></i>Xem chi tiết
+                            </a>
+                            <form method="post" asp-page-handler="Remove">
+                                <input type="hidden" name="productId" value="@product.ProductId" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .favourites-page {
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        background: var(--white);
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .page-title i {
+        color: var(--danger);
+    }
+
+    .page-subtitle {
+        color: var(--gray-500);
+        margin-bottom: 0;
+    }
+
+    .favourites-info {
+        margin-bottom: 1rem;
+    }
+
+    .count-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: var(--primary-bg);
+        color: var(--primary);
+        border-radius: var(--radius-full);
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .product-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        transition: all var(--transition-base);
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .product-image {
+        position: relative;
+        height: 180px;
+        background: var(--gray-100);
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .placeholder-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-400);
+        font-size: 3rem;
+    }
+
+    .product-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0.3rem 0.75rem;
+        border-radius: var(--radius-full);
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .product-status.đang-hiển-thị {
+        background: var(--success);
+        color: white;
+    }
+
+    .product-status.đã-ẩn {
+        background: var(--warning);
+        color: #78350f;
+    }
+
+    .product-status.đã-bán {
+        background: var(--primary);
+        color: white;
+    }
+
+    .remove-form {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+
+    .remove-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.9);
+        color: var(--danger);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 1rem;
+    }
+
+    .remove-btn:hover {
+        background: var(--danger);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .product-content {
+        padding: 1rem;
+    }
+
+    .product-meta {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .product-category,
+    .product-condition {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        background: var(--gray-100);
+        border-radius: var(--radius-sm);
+        color: var(--gray-600);
+    }
+
+    .product-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+    }
+
+    .product-price {
+        display: flex;
+        align-items: baseline;
+        gap: 0.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .price-value {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .price-currency {
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .product-actions .btn {
+        padding: 0.4rem 0.75rem;
+    }
+
+    /* Empty State */
+    .empty-state-card {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--gray-100);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .empty-icon i {
+        font-size: 2.5rem;
+        color: var(--danger);
+    }
+
+    .empty-state-card h4 {
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state-card p {
+        color: var(--gray-500);
+        margin-bottom: 1.5rem;
+    }
+</style>

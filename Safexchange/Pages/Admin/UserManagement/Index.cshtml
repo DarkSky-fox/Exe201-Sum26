@@ -16,16 +16,6 @@
             <p class="admin-subtitle">Danh sách thành viên tham gia hệ thống Safexchange</p>
         </div>
         <div class="col-md-6 text-md-end">
-            <div class="header-actions">
-                <a asp-page="./PendingVerifications" class="btn btn-outline-primary">
-                    <i class="bi bi-patch-check me-1"></i>
-                    Danh sách xác thực
-                </a>
-                <a asp-page="Create" class="btn btn-primary">
-                    <i class="bi bi-person-plus me-1"></i>
-                    Thêm người dùng
-                </a>
-            </div>
         </div>
     </div>
 
@@ -69,10 +59,14 @@
             <span>Danh sách người dùng</span>
         </div>
         <div class="header-actions">
-            <div class="search-box">
-                <i class="bi bi-search"></i>
-                <input type="text" class="form-control" placeholder="Tìm kiếm..." />
-            </div>
+            <a asp-page="./PendingVerifications" class="btn btn-outline-primary">
+                <i class="bi bi-patch-check me-1"></i>
+                Danh sách xác thực
+            </a>
+            <a asp-page="Create" class="btn btn-primary">
+                <i class="bi bi-person-plus me-1"></i>
+                Thêm người dùng
+            </a>
         </div>
     </div>
     <div class="card-body p-0">
@@ -215,12 +209,6 @@
     .admin-subtitle {
         color: var(--gray-500);
         margin-bottom: 0;
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
     }
 
     .admin-stats {
@@ -470,6 +458,10 @@
         align-items: center;
         justify-content: center;
         border-radius: var(--radius-md);
+    }
+
+    .header-actions .btn {
+        margin-left: 0.5rem;
     }
 
     @@media (max-width: 1200px) {

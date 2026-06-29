@@ -36,7 +36,7 @@ namespace Safexchange
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/Login";
-                    options.AccessDeniedPath = "/AccessDenied";
+                    options.AccessDeniedPath = "/Login";
                     options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 })
                 .AddGoogle(options =>

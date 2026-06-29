@@ -50,13 +50,16 @@
                 
                 <!-- Share & Actions -->
                 <div class="product-actions-bar mt-3">
+                    <button class="action-btn @(Model.IsFavourited ? "favourited" : "")"
+                            onclick="toggleFavourite(@p.ProductId, this)"
+                            id="favouriteBtn"
+                            data-is-favourited="@Model.IsFavourited.ToString().ToLower()">
+                        <i class="@(Model.IsFavourited ? "bi bi-heart-fill" : "bi bi-heart")"></i>
+                        <span>@(Model.IsFavourited ? "Đã lưu" : "Lưu")</span>
+                    </button>
                     <button class="action-btn" onclick="shareProduct()">
                         <i class="bi bi-share"></i>
                         <span>Chia sẻ</span>
-                    </button>
-                    <button class="action-btn" onclick="saveProduct()">
-                        <i class="bi bi-bookmark"></i>
-                        <span>Lưu</span>
                     </button>
                 </div>
             </div>
@@ -347,6 +350,16 @@
     .action-btn:hover {
         background: var(--primary-bg);
         color: var(--primary);
+    }
+
+    .action-btn.favourited {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .action-btn.favourited:hover {
+        background: #ef4444;
+        color: white;
     }
 
     .product-info-card {
@@ -651,9 +664,31 @@
 
 @section Scripts {
     <script src="~/js/cart.js" asp-append-version="true"></script>
-    <script src="~/js/product-actions.js" asp-append-version="true"></script>
+    <script src="~/js/favourite.js" asp-append-version="true"></script>
     <script>
         Cart.refreshBadge();
+        Favourite.refreshBadge();
+
+        function toggleFavourite(productId, btn) {
+            fetch(`/Products/Detail?handler=ToggleFavourite&id=${productId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.isFavourited) {
+                        btn.classList.add('favourited');
+                        btn.querySelector('i').className = 'bi bi-heart-fill';
+                        btn.querySelector('span').textContent = 'Đã lưu';
+                    } else {
+                        btn.classList.remove('favourited');
+                        btn.querySelector('i').className = 'bi bi-heart';
+                        btn.querySelector('span').textContent = 'Lưu';
+                    }
+                    Favourite.refreshBadge();
+                }
+            })
+            .catch(err => console.error(err));
+        }
+
         function shareProduct() {
             if (navigator.share) {
                 navigator.share({
@@ -665,9 +700,6 @@
                 navigator.clipboard.writeText(window.location.href);
                 alert('Đã sao chép link!');
             }
-        }
-        function saveProduct() {
-            alert('Đã lưu sản phẩm!');
         }
     </script>
 }

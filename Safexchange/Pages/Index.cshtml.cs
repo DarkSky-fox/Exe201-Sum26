@@ -9,21 +9,36 @@ namespace Safexchange.Pages;
 public class IndexModel : PageModel
 {
     private readonly SafexchangeDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public IndexModel(SafexchangeDbContext db)
+    public IndexModel(SafexchangeDbContext db, ICurrentUserService currentUser)
     {
         _db = db;
+        _currentUser = currentUser;
     }
 
     public IList<ProductListItem> Products { get; private set; } = new List<ProductListItem>();
     public IList<ProductListItem> VipProducts { get; private set; } = new List<ProductListItem>();
     public IList<ProductListItem> SponsoredProducts { get; private set; } = new List<ProductListItem>();
     public IList<CategoryItem> Categories { get; private set; } = new List<CategoryItem>();
+    public HashSet<int> FavouriteIds { get; private set; } = new();
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var now = DateTime.Now;
         var displayStatusIds = await GetDisplayStatusIdsAsync(cancellationToken);
+        var userId = _currentUser.GetUserId();
+        var isAuthenticated = User.Identity?.IsAuthenticated == true;
+
+        // Get user's favourite product IDs
+        if (isAuthenticated && userId != 0)
+        {
+            FavouriteIds = (await _db.Favourites
+                .Where(f => f.UserId == userId)
+                .Select(f => f.ProductId)
+                .ToListAsync(cancellationToken))
+                .ToHashSet();
+        }
 
         Categories = await _db.Categories
             .AsNoTracking()
@@ -151,7 +166,8 @@ public class IndexModel : PageModel
             product.CoverImageUrl,
             variant,
             isAuthenticated,
-            showCartActions);
+            showCartActions,
+            isFavourited: false);
 
     public class ProductListItem
     {

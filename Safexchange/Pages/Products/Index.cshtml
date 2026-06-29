@@ -168,7 +168,8 @@
                              HomeProductCardVariant.Catalog,
                              isAuthenticated,
                              showCartActions: true,
-                             cartIconOnly: true)" />
+                             cartIconOnly: true,
+                             isFavourited: Model.FavouriteIds.Contains(product.ProductId))" />
             }
         </div>
     }
@@ -458,5 +459,9 @@
 
 @section Scripts {
     <script src="~/js/cart.js" asp-append-version="true"></script>
-    <script>Cart.refreshBadge();</script>
+    <script src="~/js/favourite.js" asp-append-version="true"></script>
+    <script>
+        Cart.refreshBadge();
+        Favourite.refreshBadge();
+    </script>
 }

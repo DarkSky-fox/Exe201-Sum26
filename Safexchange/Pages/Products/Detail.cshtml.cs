@@ -29,6 +29,7 @@ public class DetailModel : PageModel
     public Product? Product { get; private set; }
     public string? CoverImageUrl { get; private set; }
     public bool IsAvailableForPurchase { get; private set; } = true;
+    public bool IsFavourited { get; private set; } = false;
 
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
@@ -52,6 +53,14 @@ public class DetailModel : PageModel
             .FirstOrDefault();
 
         IsAvailableForPurchase = ProductStatusHelper.IsDisplayStatus(Product.Status);
+
+        // Check if user has favourited this product
+        var userId = _currentUser.GetUserId();
+        if (userId != 0)
+        {
+            IsFavourited = await _db.Favourites
+                .AnyAsync(f => f.UserId == userId && f.ProductId == id, cancellationToken);
+        }
 
         Product.ViewCount++;
         await _db.SaveChangesAsync(cancellationToken);
@@ -108,5 +117,36 @@ public class DetailModel : PageModel
             cartCount = result.CartCount,
             redirectUrl = Url.Page("/Checkout/Index")
         });
+    }
+
+    public async Task<IActionResult> OnGetToggleFavouriteAsync(int id)
+    {
+        var userId = _currentUser.GetUserId();
+        if (userId == 0)
+        {
+            return new JsonResult(new { success = false, message = "Vui lòng đăng nhập" });
+        }
+
+        var existing = await _db.Favourites
+            .FirstOrDefaultAsync(f => f.UserId == userId && f.ProductId == id);
+
+        if (existing != null)
+        {
+            _db.Favourites.Remove(existing);
+            await _db.SaveChangesAsync();
+            return new JsonResult(new { success = true, isFavourited = false });
+        }
+        else
+        {
+            var favourite = new Favourite
+            {
+                UserId = userId,
+                ProductId = id,
+                CreatedAt = DateTime.Now
+            };
+            _db.Favourites.Add(favourite);
+            await _db.SaveChangesAsync();
+            return new JsonResult(new { success = true, isFavourited = true });
+        }
     }
 }
