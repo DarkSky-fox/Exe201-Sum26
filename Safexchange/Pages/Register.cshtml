@@ -168,6 +168,7 @@
         background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
     }
 
+    <style>
     .register-page {
         min-height: 100vh;
         display: flex;
@@ -281,9 +282,9 @@
     }
 
         .custom-input:focus {
-            border-color: #4f46e5;
+            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
         }
 
     .register-btn {
@@ -291,19 +292,19 @@
         padding: 14px;
         border: none;
         border-radius: 14px;
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: white;
         font-size: 16px;
         font-weight: 700;
         cursor: pointer;
         margin-top: 8px;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 10px 24px rgba(79, 70, 229, 0.22);
+        box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3);
     }
 
         .register-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 28px rgba(79, 70, 229, 0.28);
+            box-shadow: 0 14px 28px rgba(59, 130, 246, 0.35);
         }
 
     .divider {
@@ -363,7 +364,7 @@
     }
 
         .login-link a {
-            color: #4f46e5;
+            color: var(--primary);
             text-decoration: none;
             font-weight: 700;
         }

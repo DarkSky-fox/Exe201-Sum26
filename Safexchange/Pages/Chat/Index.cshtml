@@ -1,0 +1,205 @@
+@page "{id:int?}"
+@model Safexchange.Pages.Chat.IndexModel
+@{
+    ViewData["Title"] = "Tin nhắn";
+}
+
+<div class="chat-container">
+    <!-- Conversations List -->
+    <div class="chat-conversations-list @(Model.SelectedConversation != null ? "hidden-mobile" : "")" id="chat-conversations-list">
+        <div class="chat-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Tin nhắn</h5>
+            @if (Model.SelectedConversation != null)
+            {
+                <button class="btn btn-sm btn-outline-secondary d-md-none" onclick="toggleMobileChat('chat')">
+                    <i class="bi bi-chat"></i>
+                </button>
+            }
+        </div>
+        <div class="conversations-search">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" placeholder="Tìm kiếm cuộc trò chuyện..." id="conversation-search" />
+            </div>
+        </div>
+        <div id="conversations-list" class="conversations-list">
+            @if (Model.Conversations.Any())
+            {
+                @foreach (var conv in Model.Conversations)
+                {
+                    <a href="/Chat/Index/@conv.ConversationId" 
+                       class="conversation-item @(Model.SelectedConversationId == conv.ConversationId ? "active" : "")"
+                       data-conversation-id="@conv.ConversationId">
+                        <div class="conversation-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="conversation-info">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="conversation-name">@(conv.BuyerId == Model.CurrentUserId ? (conv.Seller?.FullName ?? "Unknown") : (conv.Buyer?.FullName ?? "Unknown"))</span>
+                                <small class="text-muted time-ago" data-time="@conv.LastMessage?.CreatedAt.ToString("o")">
+                                    @if (conv.LastMessage != null)
+                                    {
+                                        @FormatTimeAgo(conv.LastMessage.CreatedAt)
+                                    }
+                                </small>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="conversation-preview mb-0 text-truncate">
+                                    @if (conv.LastMessage != null)
+                                    {
+                                        <span class="@(conv.LastMessage.SenderId == Model.CurrentUserId ? "text-muted" : "")">
+                                            @(conv.LastMessage.SenderId == Model.CurrentUserId ? "Bạn: " : "")@conv.LastMessage.MessageText
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa có tin nhắn</span>
+                                    }
+                                </p>
+                                @if (conv.UnreadCount > 0)
+                                {
+                                    <span class="badge bg-primary rounded-pill">@conv.UnreadCount</span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-chat-square-text fs-1"></i>
+                    <p class="mt-2">Chưa có cuộc trò chuyện nào</p>
+                    <small>Bắt đầu trò chuyện với người bán khi xem sản phẩm</small>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window @(Model.SelectedConversation != null ? "" : "hidden-mobile")" id="chat-window">
+        @if (Model.SelectedConversation != null)
+        {
+            <!-- Chat Header -->
+            <div class="chat-window-header">
+                <div class="chat-header-left">
+                    <button class="chat-back-btn" onclick="toggleMobileChat('list')">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="chat-user-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">@(Model.SelectedConversation.BuyerId == Model.CurrentUserId ? (Model.SelectedConversation.Seller?.FullName ?? "Unknown") : (Model.SelectedConversation.Buyer?.FullName ?? "Unknown"))</h6>
+                            <small class="text-muted">
+                                @Model.SelectedConversation.Product?.Title
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <a href="/Products/Detail/@Model.SelectedConversation.ProductId" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-box-seam me-1"></i>Xem sản phẩm
+                </a>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chat-messages">
+                @foreach (var message in Model.Messages)
+                {
+                    <div class="message @(message.SenderId == Model.CurrentUserId ? "message-outgoing" : "message-incoming")" 
+                         data-message-id="@message.MessageId">
+                        <div class="message-bubble">
+                            <p class="mb-0">@message.MessageText</p>
+                            <div class="message-time">
+                                @FormatTimeAgo(message.CreatedAt)
+                                @if (message.SenderId == Model.CurrentUserId)
+                                {
+                                    <i class="bi @(message.IsRead ? "bi-check-all text-primary" : "bi-check")"></i>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Message Input -->
+            <div class="chat-input-area">
+                <form id="message-form" class="w-100">
+                    <div class="input-group">
+                        <input type="text" 
+                               id="message-input" 
+                               class="form-control" 
+                               placeholder="Nhập tin nhắn..." 
+                               autocomplete="off" />
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="chat-empty-state">
+                <div class="text-center">
+                    <i class="bi bi-chat-dots fs-1 text-muted"></i>
+                    <h5 class="mt-3">Chọn một cuộc trò chuyện</h5>
+                    <p class="text-muted">Chọn cuộc trò chuyện từ danh sách bên trái hoặc bắt đầu trò chuyện với người bán khi xem sản phẩm</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    private string FormatTimeAgo(DateTime dateTime)
+    {
+        var timeSpan = DateTime.UtcNow - dateTime;
+        
+        if (timeSpan.TotalMinutes < 1)
+            return "Vừa xong";
+        if (timeSpan.TotalMinutes < 60)
+            return $"{(int)timeSpan.TotalMinutes}p";
+        if (timeSpan.TotalHours < 24)
+            return $"{(int)timeSpan.TotalHours} giờ";
+        if (timeSpan.TotalDays < 7)
+            return $"{(int)timeSpan.TotalDays} ngày";
+        
+        return dateTime.ToString("dd/MM/yyyy");
+    }
+}
+
+@section Scripts {
+    <script>
+        // Initialize chat variables
+        const conversationId = @(Model.SelectedConversationId.HasValue ? Model.SelectedConversationId.Value.ToString() : "null");
+        const currentUserId = @Model.CurrentUserId;
+        
+        // Set global variables for chat.js
+        if (typeof Chat !== 'undefined') {
+            Chat.currentConversationId = conversationId;
+            Chat.currentUserId = currentUserId;
+        }
+        
+        // Also set in the module scope (chat.js uses closure)
+        window.chatConversationId = conversationId;
+        window.chatCurrentUserId = currentUserId;
+        
+        // Mobile chat toggle function
+        function toggleMobileChat(view) {
+            const conversationsList = document.getElementById('chat-conversations-list');
+            const chatWindow = document.getElementById('chat-window');
+            
+            if (view === 'chat') {
+                conversationsList.classList.add('hidden-mobile');
+                chatWindow.classList.remove('hidden-mobile');
+            } else {
+                conversationsList.classList.remove('hidden-mobile');
+                chatWindow.classList.add('hidden-mobile');
+            }
+        }
+    </script>
+}

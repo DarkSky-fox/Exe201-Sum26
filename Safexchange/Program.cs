@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Safexchange.Hubs;
 using Safexchange.Models;
 using Safexchange.Services;
 
@@ -52,6 +54,16 @@ namespace Safexchange
                 });
 
             // =========================================
+            // SIGNALR
+            // =========================================
+            builder.Services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+            });
+
+            builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+
+            // =========================================
             // AUTHORIZATION
             // =========================================
             builder.Services.AddAuthorization();
@@ -93,6 +105,8 @@ namespace Safexchange
             builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 
             builder.Services.AddScoped<IShipmentService, ShipmentService>();
+
+            builder.Services.AddScoped<INotificationService, NotificationService>();
 
             builder.Services.AddSingleton<IProductImageStorage, ProductImageStorage>();
 
@@ -151,6 +165,12 @@ namespace Safexchange
             // DEFAULT ROUTE
             // =========================================
            
+
+            // =========================================
+            // SIGNALR HUB ROUTING
+            // =========================================
+            app.MapHub<ChatHub>("/hubs/chat");
+            app.MapHub<NotificationHub>("/hubs/notification");
 
             // =========================================
             // RAZOR PAGES

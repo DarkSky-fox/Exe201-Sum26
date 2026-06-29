@@ -1,5 +1,436 @@
 @page
 @model Safexchange.Pages.Cart.IndexModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Giỏ hàng";
 }
+
+<div class="cart-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="bi bi-cart3 me-2"></i>Giỏ hàng
+        </h1>
+        <p class="page-subtitle">Kiểm tra và quản lý các sản phẩm đã thêm</p>
+    </div>
+
+    <!-- Cart Content -->
+    <div class="row g-4">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+            <div class="cart-card">
+                <div class="cart-header">
+                    <div class="cart-count">
+                        <span class="count-value">@Model.Items.Count</span>
+                        <span class="count-label">sản phẩm trong giỏ</span>
+                    </div>
+                </div>
+
+                <div class="cart-items" id="cart-items">
+                    @if (Model.Items.Any())
+                    {
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="cart-item" data-item-id="@item.ProductId">
+                                <div class="item-image">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="" />
+                                    }
+                                    else
+                                    {
+                                        <div class="placeholder">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="item-details">
+                                    <h5 class="item-title">@item.Title</h5>
+                                    <div class="item-meta">
+                                        <span class="item-price">@item.UnitPrice.ToString("N0") đ</span>
+                                    </div>
+                                </div>
+                                <div class="item-quantity">
+                                    <span class="qty-label">SL: @item.Quantity</span>
+                                </div>
+                                <div class="item-total">
+                                    <span class="total-label">Tổng</span>
+                                    <span class="total-value">@item.LineTotal.ToString("N0") đ</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-cart">
+                            <div class="empty-icon">
+                                <i class="bi bi-cart-x"></i>
+                            </div>
+                            <h4>Giỏ hàng trống</h4>
+                            <p>Hãy thêm sản phẩm vào giỏ hàng để tiếp tục</p>
+                            <a asp-page="/Products/Index" class="btn btn-primary">
+                                <i class="bi bi-bag me-1"></i>Tiếp tục mua sắm
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        @if (Model.Items.Any())
+        {
+            <div class="col-lg-4">
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <h4 class="summary-title">
+                            <i class="bi bi-receipt"></i>
+                            Tóm tắt đơn hàng
+                        </h4>
+                    </div>
+                    <div class="summary-body">
+                        <div class="summary-row">
+                            <span>Tạm tính (@Model.Items.Count sản phẩm)</span>
+                            <span>@Model.Total.ToString("N0") đ</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row total">
+                            <span>Tổng cộng</span>
+                            <span class="text-danger">@Model.Total.ToString("N0") đ</span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <a asp-page="/Checkout/Index" class="btn btn-danger btn-lg w-100">
+                            <i class="bi bi-credit-card me-2"></i>Thanh toán ngay
+                        </a>
+                        <a asp-page="/Products/Index" class="btn btn-outline-secondary w-100 mt-2">
+                            <i class="bi bi-bag-plus me-1"></i>Tiếp tục mua sắm
+                        </a>
+                    </div>
+
+                    <!-- Escrow Box -->
+                    <div class="escrow-guarantee">
+                        <div class="guarantee-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="guarantee-content">
+                            <h6>Mua hàng an toàn với Escrow</h6>
+                            <p>Tiền được giữ an toàn cho đến khi bạn xác nhận nhận được hàng.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .cart-page {
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .page-title i {
+        color: var(--primary);
+    }
+
+    .page-subtitle {
+        color: var(--gray-500);
+        margin-bottom: 0;
+    }
+
+    .cart-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .cart-count {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+
+    .count-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .count-label {
+        color: var(--gray-500);
+        font-size: 0.9rem;
+    }
+
+    .cart-items {
+        padding: 0;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-image {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        flex-shrink: 0;
+        background: var(--gray-100);
+    }
+
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .item-image .placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-400);
+        font-size: 1.5rem;
+    }
+
+    .item-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .item-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.35rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-meta {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .item-price {
+        font-size: 0.9rem;
+        color: var(--gray-500);
+    }
+
+    .item-quantity {
+        flex-shrink: 0;
+    }
+
+    .qty-label {
+        font-weight: 600;
+        color: var(--gray-700);
+    }
+
+    .item-total {
+        text-align: right;
+        min-width: 100px;
+    }
+
+    .total-label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--gray-400);
+        margin-bottom: 0.15rem;
+    }
+
+    .total-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--gray-100);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .empty-icon i {
+        font-size: 2.5rem;
+        color: var(--gray-400);
+    }
+
+    .empty-cart h4 {
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-cart p {
+        color: var(--gray-500);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Summary Card */
+    .summary-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        position: sticky;
+        top: 80px;
+    }
+
+    .summary-header {
+        padding: 1.25rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .summary-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .summary-title i {
+        color: var(--primary);
+    }
+
+    .summary-body {
+        padding: 1.25rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .summary-divider {
+        height: 1px;
+        background: var(--gray-200);
+        margin: 1rem 0;
+    }
+
+    .summary-row.total {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .summary-footer {
+        padding: 1.25rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .summary-footer .btn {
+        padding: 0.75rem;
+        font-weight: 600;
+    }
+
+    .escrow-guarantee {
+        display: flex;
+        gap: 0.75rem;
+        margin: 1rem 1.25rem 1.25rem;
+        padding: 1rem;
+        background: rgba(16, 185, 129, 0.05);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: var(--radius-md);
+    }
+
+    .guarantee-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--success);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .guarantee-icon i {
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .guarantee-content h6 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+
+    .guarantee-content p {
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        margin-bottom: 0;
+        line-height: 1.4;
+    }
+
+    @@media (max-width: 992px) {
+        .summary-card {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .cart-item {
+            flex-wrap: wrap;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+        }
+
+        .item-details {
+            flex-basis: calc(100% - 76px);
+        }
+
+        .item-quantity,
+        .item-total {
+            margin-top: 0.75rem;
+        }
+    }
+</style>

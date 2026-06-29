@@ -1,0 +1,213 @@
+@page
+@model Safexchange.Pages.AboutModel
+@{
+    ViewData["Title"] = "Giới thiệu";
+}
+
+<div class="container py-4">
+    <div class="about-page">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">
+                <i class="bi bi-shop me-2"></i>Giới thiệu Safexchange
+            </h2>
+            <p class="text-muted">Nền tảng mua bán trực tuyến dành cho sinh viên</p>
+        </div>
+
+        <div class="about-hero text-center mb-5">
+            <div class="about-icon">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <h3>Mua bán an toàn với hệ thống Escrow</h3>
+            <p class="text-muted">Safexchange giúp sinh viên yên tâm giao dịch với hệ thống ký gửi bảo vệ cả hai bên.</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="about-card">
+                    <div class="about-card-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <h5>An toàn tuyệt đối</h5>
+                    <p>Hệ thống Escrow đảm bảo tiền chỉ được chuyển khi người mua nhận được hàng đúng với mô tả.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="about-card">
+                    <div class="about-card-icon">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    <h5>Thanh toán đa dạng</h5>
+                    <p>Hỗ trợ nhiều phương thức thanh toán an toàn và tiện lợi cho sinh viên.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="about-card">
+                    <div class="about-card-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5>Dành cho sinh viên</h5>
+                    <p>Được thiết kế riêng cho nhu cầu mua bán đồ cũ của sinh viên với chi phí thấp nhất.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-how-it-works mb-5">
+            <h4 class="text-center mb-4">Cách hoạt động</h4>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h6>Tạo tài khoản</h6>
+                        <p>Đăng ký với email sinh viên để bắt đầu</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h6>Tìm sản phẩm</h6>
+                        <p>Khám phá hàng ngàn sản phẩm từ các sinh viên khác</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h6>Thanh toán Escrow</h6>
+                        <p>Tiền được giữ an toàn cho đến khi nhận hàng</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h6>Nhận hàng & Xác nhận</h6>
+                        <p>Xác nhận đã nhận để hoàn tất giao dịch</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-stats text-center">
+            <div class="row g-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <h3 class="stat-number">10,000+</h3>
+                        <p class="stat-label">Người dùng</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <h3 class="stat-number">50,000+</h3>
+                        <p class="stat-label">Sản phẩm</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <h3 class="stat-number">100,000+</h3>
+                        <p class="stat-label">Giao dịch</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <h3 class="stat-number">99%</h3>
+                        <p class="stat-label">Hài lòng</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .about-page {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .about-hero {
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+    }
+
+    .about-icon {
+        width: 80px;
+        height: 80px;
+        background: #2563eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .about-icon i {
+        font-size: 2.5rem;
+        color: #fff;
+    }
+
+    .about-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        height: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .about-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .about-card-icon {
+        width: 60px;
+        height: 60px;
+        background: #eff6ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+
+    .about-card-icon i {
+        font-size: 1.5rem;
+        color: #2563eb;
+    }
+
+    .step-card {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        position: relative;
+    }
+
+    .step-number {
+        width: 48px;
+        height: 48px;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 auto 1rem;
+    }
+
+    .stat-item {
+        padding: 1rem;
+    }
+
+    .stat-number {
+        color: #2563eb;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 0;
+    }
+</style>

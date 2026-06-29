@@ -1,8 +1,185 @@
 ﻿@page
-@model PrivacyModel
+@model Safexchange.Pages.PrivacyModel
 @{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Quyền riêng tư";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container py-4">
+    <div class="privacy-page">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">
+                <i class="bi bi-shield-lock me-2"></i>Chính sách quyền riêng tư
+            </h2>
+            <p class="text-muted">Cập nhật: 01/01/2026</p>
+        </div>
+
+        <div class="privacy-content">
+            <div class="privacy-section">
+                <h5><i class="bi bi-info-circle me-2"></i>1. Giới thiệu</h5>
+                <p>Safexchange cam kết bảo vệ quyền riêng tư của bạn. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn khi sử dụng dịch vụ.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-folder-plus me-2"></i>2. Thông tin chúng tôi thu thập</h5>
+                <p>Chúng tôi thu thập các thông tin sau:</p>
+                <ul>
+                    <li><strong>Thông tin đăng ký:</strong> Họ tên, email, số điện thoại, mật khẩu (đã mã hóa)</li>
+                    <li><strong>Thông tin giao dịch:</strong> Lịch sử mua bán, địa chỉ giao hàng, thông tin thanh toán</li>
+                    <li><strong>Thông tin sản phẩm:</strong> Hình ảnh, mô tả, giá cả khi bạn đăng bán</li>
+                    <li><strong>Dữ liệu sử dụng:</strong> Địa chỉ IP, loại trình duyệt, thời gian truy cập</li>
+                    <li><strong>Nội dung tương tác:</strong> Tin nhắn chat, đánh giá, bình luận</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-gear me-2"></i>3. Cách chúng tôi sử dụng thông tin</h5>
+                <p>Thông tin của bạn được sử dụng để:</p>
+                <ul>
+                    <li>Cung cấp và duy trì dịch vụ Safexchange</li>
+                    <li>Xử lý giao dịch mua bán và thanh toán</li>
+                    <li>Giao hàng và liên lạc với người mua/người bán</li>
+                    <li>Gửi thông báo về đơn hàng, tin nhắn và cập nhật tài khoản</li>
+                    <li>Cải thiện trải nghiệm người dùng và phát triển tính năng mới</li>
+                    <li>Ngăn chặn gian lận và bảo vệ an toàn cho cộng đồng</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-share me-2"></i>4. Chia sẻ thông tin</h5>
+                <p>Chúng tôi <strong>không bán</strong> thông tin cá nhân của bạn. Thông tin chỉ được chia sẻ trong các trường hợp:</p>
+                <ul>
+                    <li><strong>Với người mua/người bán:</strong> Thông tin cần thiết để hoàn tất giao dịch (tên, địa chỉ giao hàng)</li>
+                    <li><strong>Với đối tác vận chuyển:</strong> Địa chỉ giao hàng để giao sản phẩm</li>
+                    <li><strong>Cơ quan chức năng:</strong> Khi được yêu cầu theo quy định pháp luật</li>
+                    <li><strong>Nhà cung cấp dịch vụ:</strong> Các bên cung cấp hạ tầng kỹ thuật (đã ký thỏa thuận bảo mật)</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-lock me-2"></i>5. Bảo mật dữ liệu</h5>
+                <p>Chúng tôi áp dụng các biện pháp bảo mật:</p>
+                <ul>
+                    <li>Mã hóa SSL cho tất cả dữ liệu truyền tải</li>
+                    <li>Mã hóa bcrypt cho mật khẩu</li>
+                    <li>Lưu trữ dữ liệu trên máy chủ bảo mật</li>
+                    <li>Giới hạn quyền truy cập nhân viên</li>
+                    <li>Giám sát và cập nhật bảo mật định kỳ</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-cookie me-2"></i>6. Cookies</h5>
+                <p>Chúng tôi sử dụng cookies để:</p>
+                <ul>
+                    <li>Duy trì phiên đăng nhập</li>
+                    <li>Ghi nhớ tùy chọn người dùng</li>
+                    <li>Phân tích lưu lượng trang web</li>
+                </ul>
+                <p>Bạn có thể tắt cookies trong cài đặt trình duyệt, nhưng một số tính năng có thể không hoạt động đầy đủ.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-person-check me-2"></i>7. Quyền của bạn</h5>
+                <p>Bạn có các quyền sau:</p>
+                <ul>
+                    <li><strong>Truy cập:</strong> Xem thông tin cá nhân đang lưu trữ</li>
+                    <li><strong>Chỉnh sửa:</strong> Cập nhật thông tin không chính xác</li>
+                    <li><strong>Xóa:</strong> Yêu cầu xóa tài khoản và dữ liệu</li>
+                    <li><strong>Hạn chế:</strong> Yêu cầu giới hạn xử lý dữ liệu</li>
+                    <li><strong>Phản đối:</strong> Phản đối việc xử lý dữ liệu</li>
+                    <li><strong>Xuất dữ liệu:</strong> Nhận bản sao dữ liệu của bạn</li>
+                </ul>
+                <p>Để thực hiện quyền nào, vui lòng liên hệ: <strong>privacy@safexchange.edu.vn</strong></p>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-hourglass-split me-2"></i>8. Lưu trữ dữ liệu</h5>
+                <p>Thông tin của bạn được lưu trữ:</p>
+                <ul>
+                    <li>Tài khoản: Trong thời gian bạn sử dụng dịch vụ + 1 năm sau khi xóa</li>
+                    <li>Lịch sử giao dịch: 5 năm theo quy định tài chính</li>
+                    <li>Nhật ký hệ thống: 90 ngày</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-children me-2"></i>9. Trẻ em</h5>
+                <p>Dịch vụ Safexchange không dành cho người dưới 16 tuổi. Chúng tôi không cố ý thu thập thông tin từ trẻ em. Nếu phát hiện, chúng tôi sẽ xóa ngay lập tức.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-arrow-repeat me-2"></i>10. Thay đổi chính sách</h5>
+                <p>Chúng tôi có thể cập nhật chính sách này định kỳ. Thông báo sẽ được gửi qua email khi có thay đổi quan trọng. Tiếp tục sử dụng sau khi thay đổi đồng nghĩa với việc chấp nhận chính sách mới.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h5><i class="bi bi-telephone me-2"></i>11. Liên hệ</h5>
+                <p>Nếu có câu hỏi về chính sách quyền riêng tư:</p>
+                <ul>
+                    <li>Email: privacy@safexchange.edu.vn</li>
+                    <li>Điện thoại: 0123-456-789</li>
+                    <li>Địa chỉ: Trường Đại học ABC, TP. Hồ Chí Minh</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .privacy-page {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .privacy-content {
+        background: #fff;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .privacy-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .privacy-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .privacy-section h5 {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .privacy-section h5 i {
+        color: #2563eb;
+    }
+
+    .privacy-section > p {
+        color: #4b5563;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .privacy-section ul {
+        margin-bottom: 0;
+        padding-left: 1.25rem;
+    }
+
+    .privacy-section li {
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+
+    .privacy-section li:last-child {
+        margin-bottom: 0;
+    }
+</style>

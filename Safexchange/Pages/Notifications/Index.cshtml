@@ -1,0 +1,286 @@
+@page
+@model Safexchange.Pages.Notifications.IndexModel
+@{
+    ViewData["Title"] = "Thông báo";
+}
+
+<div class="notifications-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="page-title">
+                    <i class="bi bi-bell me-2"></i>Thông báo
+                </h1>
+                <p class="page-subtitle">
+                    @if (Model.UnreadCount > 0)
+                    {
+                        <span class="unread-count">@Model.UnreadCount thông báo chưa đọc</span>
+                    }
+                    else
+                    {
+                        <span>Tất cả thông báo của bạn</span>
+                    }
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                @if (Model.UnreadCount > 0)
+                {
+                    <button class="btn btn-outline-primary" onclick="Notifications.markAllAsRead()">
+                        <i class="bi bi-check-all me-1"></i>Đánh dấu đã đọc tất cả
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    @if (Model.Notifications.Any())
+    {
+        <div class="notifications-list">
+            @foreach (var notification in Model.Notifications)
+            {
+                <a href="@notification.LinkUrl" 
+                   class="notification-card @(notification.IsRead ? "" : "unread")"
+                   data-notification-id="@notification.NotificationId">
+                    <div class="notification-icon-wrapper @notification.IconClass">
+                        <i class="@notification.Icon"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            <h5 class="notification-title">@notification.Title</h5>
+                            <span class="notification-time">
+                                <i class="bi bi-clock"></i>
+                                @notification.TimeAgo
+                            </span>
+                        </div>
+                        <p class="notification-text">@notification.Content</p>
+                    </div>
+                    @if (!notification.IsRead)
+                    {
+                        <div class="unread-indicator">
+                            <span class="badge bg-primary">Mới</span>
+                        </div>
+                    }
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state-card">
+            <div class="empty-icon">
+                <i class="bi bi-bell-slash"></i>
+            </div>
+            <h4>Không có thông báo nào</h4>
+            <p>Các thông báo mới sẽ xuất hiện ở đây khi có cập nhật</p>
+        </div>
+    }
+</div>
+
+<style>
+    .notifications-page {
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        background: var(--white);
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .page-title i {
+        color: var(--primary);
+    }
+
+    .page-subtitle {
+        color: var(--gray-500);
+        margin-bottom: 0;
+    }
+
+    .unread-count {
+        color: var(--danger);
+        font-weight: 500;
+    }
+
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .notification-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        text-decoration: none;
+        transition: all var(--transition-base);
+        position: relative;
+    }
+
+    .notification-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+    }
+
+    .notification-card.unread {
+        background: var(--primary-bg);
+        border-color: var(--primary-lighter);
+    }
+
+    .notification-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.25rem;
+    }
+
+    .notification-icon-wrapper.info {
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--info);
+    }
+
+    .notification-icon-wrapper.success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .notification-icon-wrapper.warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .notification-icon-wrapper.danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .notification-icon-wrapper.primary {
+        background: var(--primary-bg);
+        color: var(--primary);
+    }
+
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .notification-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0;
+    }
+
+    .notification-time {
+        font-size: 0.75rem;
+        color: var(--gray-400);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .notification-text {
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        margin-bottom: 0;
+        line-height: 1.5;
+    }
+
+    .unread-indicator {
+        flex-shrink: 0;
+    }
+
+    .unread-indicator .badge {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Empty State */
+    .empty-state-card {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--gray-100);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .empty-icon i {
+        font-size: 2.5rem;
+        color: var(--gray-400);
+    }
+
+    .empty-state-card h4 {
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state-card p {
+        color: var(--gray-500);
+    }
+
+    @@media (max-width: 576px) {
+        .notification-header {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .notification-card {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mark notification as read when clicked
+            document.querySelectorAll('.notification-card.unread').forEach(item => {
+                item.addEventListener('click', function() {
+                    const id = this.dataset.notificationId;
+                    if (id) {
+                        Notifications.markAsRead(parseInt(id));
+                    }
+                });
+            });
+        });
+    </script>
+}

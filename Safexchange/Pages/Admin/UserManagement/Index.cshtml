@@ -6,142 +6,498 @@
     Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container-fluid text-start px-4 mt-4">
-    <!-- Tiêu đề và Thanh công cụ điều hướng nhanh -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1 text-dark fw-bold">Quản lý Người dùng</h2>
-            <p class="text-muted mb-0">Danh sách thành viên tham gia hệ thống Safexchange.</p>
+<div class="admin-page-header">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="admin-title">
+                <i class="bi bi-people"></i>
+                Quản lý Người dùng
+            </h1>
+            <p class="admin-subtitle">Danh sách thành viên tham gia hệ thống Safexchange</p>
         </div>
-        <div class="d-flex gap-2">
-            <!-- Nút xem danh sách duyệt minh chứng (User_Verification) -->
-            <a asp-page="./PendingVerifications" class="btn btn-outline-dark shadow-sm">
-                <i class="fas fa-user-check me-2"></i>Xem danh sách xác thực
-            </a>
-
-            <!-- Nút thêm tài khoản mới -->
-            <a asp-page="Create" class="btn btn-primary shadow-sm">
-                <i class="fas fa-user-plus me-2"></i>Thêm người dùng mới
-            </a>
+        <div class="col-md-6 text-md-end">
+            <div class="header-actions">
+                <a asp-page="./PendingVerifications" class="btn btn-outline-primary">
+                    <i class="bi bi-patch-check me-1"></i>
+                    Danh sách xác thực
+                </a>
+                <a asp-page="Create" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-1"></i>
+                    Thêm người dùng
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Bảng danh sách dữ liệu -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light text-secondary">
-                        <tr>
-                            <th class="ps-4">@Html.DisplayNameFor(model => model.User[0].FullName)</th>
-                            <th>@Html.DisplayNameFor(model => model.User[0].Email)</th>
-                            <th>@Html.DisplayNameFor(model => model.User[0].Phone)</th>
-                            <th>@Html.DisplayNameFor(model => model.User[0].Role)</th>
-                            <th>Khóa học (Year)</th>
-                            <th>@Html.DisplayNameFor(model => model.User[0].AccountStatus)</th>
-                            <th>@Html.DisplayNameFor(model => model.User[0].CreatedAt)</th>
-                            <th class="text-end pe-4">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.User)
-                        {
-                            var isAdmin = item.Role?.ToString().Equals("Admin", StringComparison.OrdinalIgnoreCase) ?? false;
-                            <tr>
-                                <!-- Họ và tên -->
-                                <td class="ps-4 fw-semibold text-dark">
-                                    @Html.DisplayFor(modelItem => item.FullName)
-                                </td>
-
-                                <!-- Email -->
-                                <td>@Html.DisplayFor(modelItem => item.Email)</td>
-
-                                <!-- Số điện thoại -->
-                                <td>
-                                    @(string.IsNullOrEmpty(item.Phone) ? "---" : item.Phone)
-                                </td>
-
-                                <!-- Phân quyền hệ thống -->
-                                <td>
-                                    @if (isAdmin)
-                                    {
-                                        <span class="badge bg-danger-subtle text-danger px-2 py-1">Admin</span>
-                                    }
-                                    else if (item.Role?.ToString().Equals("Shipper", StringComparison.OrdinalIgnoreCase) ?? false)
-                                    {
-                                        <span class="badge bg-warning-subtle text-warning px-2 py-1">Shipper</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-info-subtle text-info px-2 py-1">Sinh viên</span>
-                                    }
-                                </td>
-
-                                <!-- Khóa học -->
-                                <td>
-                                    <span class="text-secondary fw-medium">K@(item.YearLevel)</span>
-                                </td>
-
-                                <!-- Trạng thái tài khoản -->
-                                <td>
-                                    @if (item.AccountStatus?.ToString().Equals("Active", StringComparison.OrdinalIgnoreCase) ?? false)
-                                    {
-                                        <span class="badge bg-success text-white rounded-pill px-2 py-1">Active</span>
-                                    }
-                                    else if (item.AccountStatus?.ToString().Equals("Suspended", StringComparison.OrdinalIgnoreCase) ?? false)
-                                    {
-                                        <span class="badge bg-warning text-dark rounded-pill px-2 py-1">Suspended</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary text-white rounded-pill px-2 py-1">@item.AccountStatus</span>
-                                    }
-                                </td>
-
-                                <!-- Thời gian tham gia -->
-                                <td class="text-muted small">
-                                    @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                                    warm
-                                </td>
-
-                                <!-- Cột hành động có tên nút rõ ràng -->
-                                <td class="text-end pe-4" style="white-space: nowrap;">
-                                    @if (isAdmin)
-                                    {
-                                        <button class="btn btn-sm btn-light text-muted mb-1" disabled>
-                                            <i class="fas fa-shield-alt me-1"></i>Xác thực
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <a asp-page="./Verify" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-warning mb-1">
-                                            <i class="fas fa-shield-alt me-1"></i>Xác thực
-                                        </a>
-                                    }
-
-                                    <a asp-page="./Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-secondary mb-1">
-                                        <i class="fas fa-eye"></i> Xem
-                                    </a>
-
-                                    <a asp-page="./Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-primary mb-1">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </a>
-
-                                    <a asp-page="./Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-danger mb-1">
-                                        <i class="fas fa-trash-alt"></i> Xóa
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <!-- Stats Cards -->
+    <div class="admin-stats mt-4">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">@Model.User.Count()</span>
+                <span class="stat-label">Tổng người dùng</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="bi bi-person-check"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">@Model.User.Count(u => u.AccountStatus?.ToString() == "Active")</span>
+                <span class="stat-label">Đang hoạt động</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">@Model.User.Count(u => u.AccountStatus?.ToString() == "Suspended")</span>
+                <span class="stat-label">Bị khóa</span>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Users Table -->
+<div class="admin-card">
+    <div class="card-header">
+        <div class="header-title">
+            <i class="bi bi-table"></i>
+            <span>Danh sách người dùng</span>
+        </div>
+        <div class="header-actions">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" class="form-control" placeholder="Tìm kiếm..." />
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Người dùng</th>
+                        <th>Email</th>
+                        <th>Điện thoại</th>
+                        <th>Vai trò</th>
+                        <th>Khóa</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-end pe-4">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.User)
+                    {
+                        var isAdmin = item.Role?.ToString().Equals("Admin", StringComparison.OrdinalIgnoreCase) ?? false;
+                        <tr>
+                            <td class="ps-4">
+                                <div class="user-cell">
+                                    <div class="user-avatar">
+                                        @item.FullName.Substring(0, 1)
+                                    </div>
+                                    <span class="user-name">@item.FullName</span>
+                                </div>
+                            </td>
+                            <td>@item.Email</td>
+                            <td>
+                                <span class="phone">@(string.IsNullOrEmpty(item.Phone) ? "---" : item.Phone)</span>
+                            </td>
+                            <td>
+                                @if (isAdmin)
+                                {
+                                    <span class="role-badge admin">
+                                        <i class="bi bi-shield-star"></i>
+                                        Admin
+                                    </span>
+                                }
+                                else if (item.Role?.ToString().Equals("Shipper", StringComparison.OrdinalIgnoreCase) ?? false)
+                                {
+                                    <span class="role-badge shipper">
+                                        <i class="bi bi-truck"></i>
+                                        Shipper
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="role-badge student">
+                                        <i class="bi bi-mortarboard"></i>
+                                        Sinh viên
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                <span class="year-badge">K@(item.YearLevel)</span>
+                            </td>
+                            <td>
+                                @if (item.AccountStatus?.ToString().Equals("Active", StringComparison.OrdinalIgnoreCase) ?? false)
+                                {
+                                    <span class="status-badge active">
+                                        <i class="bi bi-check-circle"></i>
+                                        Hoạt động
+                                    </span>
+                                }
+                                else if (item.AccountStatus?.ToString().Equals("Suspended", StringComparison.OrdinalIgnoreCase) ?? false)
+                                {
+                                    <span class="status-badge suspended">
+                                        <i class="bi bi-ban"></i>
+                                        Bị khóa
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge pending">
+                                        <i class="bi bi-clock"></i>
+                                        @item.AccountStatus
+                                    </span>
+                                }
+                            </td>
+                            <td class="date-cell">
+                                @item.CreatedAt.ToString("dd/MM/yyyy")
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="action-buttons">
+                                    @if (!isAdmin)
+                                    {
+                                        <a asp-page="./Verify" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-warning" title="Xác thực">
+                                            <i class="bi bi-patch-check"></i>
+                                        </a>
+                                    }
+                                    <a asp-page="./Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-secondary" title="Xem">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-page="./Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    @if (!isAdmin)
+                                    {
+                                        <a asp-page="./Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-page-header {
+        background: var(--white);
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 1.5rem;
+    }
+
+    .admin-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .admin-title i {
+        color: var(--primary);
+    }
+
+    .admin-subtitle {
+        color: var(--gray-500);
+        margin-bottom: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .admin-stats {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-md);
+        flex: 1;
+        min-width: 160px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .stat-icon.primary {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+    }
+
+    .stat-icon.success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .stat-icon.warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .stat-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--gray-500);
+    }
+
+    .admin-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .header-title i {
+        color: var(--primary);
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+    }
+
+    .search-box .form-control {
+        padding-left: 2.25rem;
+        width: 250px;
+        border-radius: var(--radius-md);
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .admin-table thead th {
+        background: var(--gray-50);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--gray-600);
+        padding: 0.85rem 1rem;
+        border-bottom: 2px solid var(--gray-200);
+        white-space: nowrap;
+    }
+
+    .admin-table tbody tr {
+        border-bottom: 1px solid var(--gray-100);
+        transition: background 0.15s ease;
+    }
+
+    .admin-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .admin-table tbody td {
+        padding: 0.85rem 1rem;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        color: var(--gray-700);
+    }
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .phone {
+        color: var(--gray-500);
+        font-size: 0.85rem;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .role-badge.admin {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .role-badge.shipper {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .role-badge.student {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+    }
+
+    .year-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.3rem 0.6rem;
+        background: var(--gray-100);
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-600);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-badge.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-badge.suspended {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .status-badge.pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .date-cell {
+        color: var(--gray-500);
+        font-size: 0.85rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .action-buttons .btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-md);
+    }
+
+    @@media (max-width: 1200px) {
+        .admin-table {
+            font-size: 0.85rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .search-box .form-control {
+            width: 100%;
+        }
+
+        .admin-stats {
+            flex-direction: column;
+        }
+
+        .admin-table {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+
 @section Scripts {
-    <!-- Khởi chạy Tooltip Bootstrap để hiển thị gợi ý (nếu cần dùng) -->
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

@@ -1,0 +1,283 @@
+@page
+@model Safexchange.Pages.ContactModel
+@{
+    ViewData["Title"] = "Liên hệ";
+}
+
+<div class="container py-4">
+    <div class="contact-page">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">
+                <i class="bi bi-envelope me-2"></i>Liên hệ
+            </h2>
+            <p class="text-muted">Chúng tôi luôn sẵn sàng lắng nghe bạn</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="contact-info-card">
+                    <h5 class="mb-4">Thông tin liên hệ</h5>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div>
+                            <h6>Địa chỉ</h6>
+                            <p>Trường Đại học ABC, Quận 1, TP. Hồ Chí Minh</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div>
+                            <h6>Điện thoại</h6>
+                            <p>0123-456-789 (8:00 - 17:00, Thứ 2 - Thứ 6)</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div>
+                            <h6>Email</h6>
+                            <p>support@safexchange.edu.vn</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div>
+                            <h6>Giờ làm việc</h6>
+                            <p>Thứ 2 - Thứ 6: 8:00 - 17:00</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-social mt-4">
+                        <h6 class="mb-3">Kết nối với chúng tôi</h6>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-twitter-x"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="contact-form-card">
+                    <h5 class="mb-4">Gửi tin nhắn cho chúng tôi</h5>
+                    
+                    <form id="contact-form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="subject" class="form-label">Tiêu đề</label>
+                                <input type="text" class="form-control" id="subject" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="message" class="form-label">Nội dung</label>
+                                <textarea class="form-control" id="message" rows="5" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-send me-2"></i>Gửi tin nhắn
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="contact-note mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Chúng tôi sẽ phản hồi trong vòng 24 giờ làm việc.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-section mt-5">
+            <h4 class="text-center mb-4">Câu hỏi thường gặp</h4>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Làm sao để đăng bán sản phẩm?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Để đăng bán sản phẩm, bạn cần đăng nhập vào tài khoản, sau đó vào trang "Sản phẩm của bạn" và nhấn nút "Đăng sản phẩm mới". Điền đầy đủ thông tin và hình ảnh sản phẩm để hoàn tất.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Hệ thống Escrow hoạt động như thế nào?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Khi bạn thanh toán, tiền sẽ được giữ bởi Safexchange. Sau khi nhận được hàng và xác nhận đúng với mô tả, chúng tôi sẽ chuyển tiền cho người bán. Nếu có tranh chấp, chúng tôi sẽ hỗ trợ giải quyết.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Phí giao dịch là bao nhiêu?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Phí giao dịch trên Safexchange là 2% giá trị sản phẩm, được tính khi giao dịch thành công. Không có phí đăng tin hay phí ẩn nào khác.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            Tôi quên mật khẩu, phải làm sao?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Bạn có thể nhấn "Quên mật khẩu" tại trang đăng nhập và nhập email đã đăng ký. Chúng tôi sẽ gửi link đặt lại mật khẩu cho bạn.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('contact-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất có thể.');
+            this.reset();
+        });
+    </script>
+}
+
+<style>
+    .contact-page {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .contact-info-card,
+    .contact-form-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        height: 100%;
+    }
+
+    .contact-item {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .contact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-icon {
+        width: 44px;
+        height: 44px;
+        background: #eff6ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .contact-icon i {
+        color: #2563eb;
+        font-size: 1.1rem;
+    }
+
+    .contact-item h6 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #1f2937;
+    }
+
+    .contact-item p {
+        margin-bottom: 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4b5563;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .social-link:hover {
+        background: #2563eb;
+        color: #fff;
+    }
+
+    .faq-section {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 2rem;
+    }
+
+    .accordion-item {
+        border: 1px solid #e5e7eb;
+        margin-bottom: 0.5rem;
+        border-radius: 8px !important;
+        overflow: hidden;
+    }
+
+    .accordion-button {
+        font-weight: 500;
+        color: #1f2937;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .accordion-body {
+        color: #4b5563;
+        line-height: 1.6;
+    }
+</style>

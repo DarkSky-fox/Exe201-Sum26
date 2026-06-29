@@ -4,130 +4,683 @@
     ViewData["Title"] = "Thêm sản phẩm";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Thêm sản phẩm mới</h1>
-    <a asp-page="/Products/Index" class="btn btn-outline-secondary">
-        ← Quay lại danh sách
-    </a>
-</div>
-
-@if (!string.IsNullOrEmpty(TempData["ErrorMessage"]?.ToString()))
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="create-product-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="page-title">
+                    <i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm mới
+                </h1>
+                <p class="page-subtitle">Đăng sản phẩm để bắt đầu bán hàng</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a asp-page="/Products/Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Quay lại
+                </a>
+            </div>
+        </div>
     </div>
-}
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
+    <!-- Alerts -->
+    @if (!string.IsNullOrEmpty(TempData["ErrorMessage"]?.ToString()))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Main Form -->
+        <div class="col-lg-8">
+            <div class="form-card">
                 <form method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-                    <!-- Tiêu đề -->
-                    <div class="mb-3">
-                        <label asp-for="Input.Title" class="form-label fw-semibold">Tiêu đề sản phẩm <span class="text-danger">*</span></label>
-                        <input asp-for="Input.Title" class="form-control" placeholder="Nhập tiêu đề sản phẩm..." />
-                        <span asp-validation-for="Input.Title" class="text-danger small"></span>
-                    </div>
+                    <!-- Product Info Section -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-info-circle me-2"></i>Thông tin sản phẩm
+                        </h5>
 
-                    <!-- Mô tả -->
-                    <div class="mb-3">
-                        <label asp-for="Input.Description" class="form-label fw-semibold">Mô tả</label>
-                        <textarea asp-for="Input.Description" class="form-control" rows="4" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
-                        <span asp-validation-for="Input.Description" class="text-danger small"></span>
-                    </div>
-
-                    <!-- Giá -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="Input.Price" class="form-label fw-semibold">Giá bán (đ) <span class="text-danger">*</span></label>
-                            <input asp-for="Input.Price" class="form-control" type="number" min="0" step="1000" placeholder="0" />
-                            <span asp-validation-for="Input.Price" class="text-danger small"></span>
+                        <div class="form-group">
+                            <label asp-for="Input.Title" class="form-label required">Tiêu đề sản phẩm</label>
+                            <input asp-for="Input.Title" class="form-control" placeholder="VD: Laptop Dell XPS 13 cũ 95%" />
+                            <span asp-validation-for="Input.Title" class="text-danger small"></span>
+                            <div class="form-hint">Tối thiểu 10 ký tự, tối đa 200 ký tự</div>
                         </div>
-                        <div class="col-md-6">
-                            <label asp-for="Input.OriginalPrice" class="form-label fw-semibold">Giá gốc (đ)</label>
-                            <input asp-for="Input.OriginalPrice" class="form-control" type="number" min="0" step="1000" placeholder="Không bắt buộc" />
-                            <span asp-validation-for="Input.OriginalPrice" class="text-danger small"></span>
+
+                        <div class="form-group">
+                            <label asp-for="Input.Description" class="form-label">Mô tả chi tiết</label>
+                            <textarea asp-for="Input.Description" class="form-control" rows="5" placeholder="Mô tả chi tiết về sản phẩm: tình trạng, tính năng, lý do bán..."></textarea>
+                            <span asp-validation-for="Input.Description" class="text-danger small"></span>
                         </div>
                     </div>
 
-                    <!-- Danh mục & Trạng thái -->
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label asp-for="Input.CategoryId" class="form-label fw-semibold">Danh mục <span class="text-danger">*</span></label>
-                            <select asp-for="Input.CategoryId" asp-items="Model.CategoryList" class="form-select">
-                                <option value="">-- Chọn danh mục --</option>
-                            </select>
-                            <span asp-validation-for="Input.CategoryId" class="text-danger small"></span>
+                    <!-- Price Section -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-currency-dollar me-2"></i>Giá cả
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Input.Price" class="form-label required">Giá bán (VNĐ)</label>
+                                <div class="input-with-suffix">
+                                    <input asp-for="Input.Price" class="form-control" type="number" min="0" step="1000" placeholder="0" />
+                                    <span class="input-suffix">đ</span>
+                                </div>
+                                <span asp-validation-for="Input.Price" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Input.OriginalPrice" class="form-label">Giá gốc (VNĐ)</label>
+                                <div class="input-with-suffix">
+                                    <input asp-for="Input.OriginalPrice" class="form-control" type="number" min="0" step="1000" placeholder="Không bắt buộc" />
+                                    <span class="input-suffix">đ</span>
+                                </div>
+                                <span asp-validation-for="Input.OriginalPrice" class="text-danger small"></span>
+                                <div class="form-hint">Để hiển thị giảm giá</div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Tình trạng & Loại sản phẩm -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="Input.ConditionStatus" class="form-label fw-semibold">Tình trạng sản phẩm <span class="text-danger">*</span></label>
-                            <select asp-for="Input.ConditionStatus" class="form-select">
-                                <option value="like_new">Như mới</option>
-                                <option value="good">Tốt</option>
-                                <option value="fair">Khá tốt</option>
-                                <option value="need_repair">Cần sửa chữa</option>
-                            </select>
-                            <span asp-validation-for="Input.ConditionStatus" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Input.ProductType" class="form-label fw-semibold">Loại sản phẩm <span class="text-danger">*</span></label>
-                            <select asp-for="Input.ProductType" class="form-select">
-                                <option value="single">Đơn lẻ</option>
-                                <option value="combo">Combo</option>
-                            </select>
-                            <span asp-validation-for="Input.ProductType" class="text-danger small"></span>
+                    <!-- Category & Condition -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-grid-3x3-gap me-2"></i>Danh mục & Tình trạng
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Input.CategoryId" class="form-label required">Danh mục</label>
+                                <select asp-for="Input.CategoryId" asp-items="Model.CategoryList" class="form-select">
+                                    <option value="">-- Chọn danh mục --</option>
+                                </select>
+                                <span asp-validation-for="Input.CategoryId" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Input.ConditionStatus" class="form-label required">Tình trạng</label>
+                                <select asp-for="Input.ConditionStatus" class="form-select">
+                                    <option value="like_new">Như mới (95-100%)</option>
+                                    <option value="good">Tốt (80-94%)</option>
+                                    <option value="fair">Khá tốt (60-79%)</option>
+                                    <option value="need_repair">Cần sửa chữa (&lt;60%)</option>
+                                </select>
+                                <span asp-validation-for="Input.ConditionStatus" class="text-danger small"></span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Ảnh sản phẩm -->
-                    <div class="mb-3">
-                        <label asp-for="CoverImage" class="form-label fw-semibold">Ảnh sản phẩm</label>
-                        <input asp-for="CoverImage" type="file" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp,.jpg,.jpeg,.png,.gif,.webp" id="coverImageInput" />
-                        <div class="form-text">JPG, PNG, GIF hoặc WEBP — tối đa 5MB. Ảnh được lưu trong thư mục Assets.</div>
+                    <!-- Product Type -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-box-seam me-2"></i>Loại sản phẩm
+                        </h5>
+
+                        <div class="product-type-options">
+                            <label class="type-option @(Model?.Input?.ProductType == "single" || Model?.Input == null ? "selected" : "")">
+                                <input type="radio" name="Input.ProductType" value="single" @(Model?.Input?.ProductType == "single" || Model?.Input == null ? "checked" : "") />
+                                <div class="type-content">
+                                    <i class="bi bi-box"></i>
+                                    <span class="type-title">Đơn lẻ</span>
+                                    <span class="type-desc">Bán từng sản phẩm riêng lẻ</span>
+                                </div>
+                            </label>
+                            <label class="type-option @(Model?.Input?.ProductType == "combo" ? "selected" : "")">
+                                <input type="radio" name="Input.ProductType" value="combo" @(Model?.Input?.ProductType == "combo" ? "checked" : "") />
+                                <div class="type-content">
+                                    <i class="bi bi-boxes"></i>
+                                    <span class="type-title">Combo</span>
+                                    <span class="type-desc">Bán nhiều sản phẩm theo bộ</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Images -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-image me-2"></i>Hình ảnh
+                        </h5>
+
+                        <div class="upload-area" id="uploadArea">
+                            <input asp-for="CoverImage" type="file" class="upload-input" accept="image/*" id="coverImageInput" />
+                            <div class="upload-content">
+                                <div class="upload-icon">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                </div>
+                                <h5>Kéo thả ảnh vào đây</h5>
+                                <p>hoặc nhấn để chọn file</p>
+                                <span class="upload-hint">JPG, PNG, GIF, WEBP - Tối đa 5MB</span>
+                            </div>
+                        </div>
+                        <div id="imagePreviewWrap" class="preview-area d-none">
+                            <img id="imagePreview" src="" alt="Preview" class="preview-image" />
+                            <button type="button" class="remove-image" onclick="removeImage()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
                         <span asp-validation-for="CoverImage" class="text-danger small"></span>
-                        <div id="imagePreviewWrap" class="image-preview-wrap mt-3 d-none">
-                            <img id="imagePreview" src="" alt="Xem trước ảnh" class="image-preview" />
+                    </div>
+
+                    <!-- Negotiable -->
+                    <div class="form-section border-0">
+                        <div class="negotiable-option">
+                            <label class="toggle-switch">
+                                <input asp-for="Input.IsNegotiable" type="checkbox" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div class="toggle-content">
+                                <span class="toggle-title">Cho phép thương lượng giá</span>
+                                <span class="toggle-desc">Người mua có thể đề nghị giá khác</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Thương lượng -->
-                    <div class="mb-4">
-                        <div class="form-check">
-                            <input asp-for="Input.IsNegotiable" class="form-check-input" type="checkbox" />
-                            <label asp-for="Input.IsNegotiable" class="form-check-label">Cho phép thương lượng giá</label>
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary px-4">
-                            <i class="bi bi-plus-circle me-1"></i> Thêm sản phẩm
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>Đăng sản phẩm
                         </button>
-                        <a asp-page="/Products/Index" class="btn btn-outline-secondary px-4">Hủy</a>
+                        <a asp-page="/Products/Index" class="btn btn-outline-secondary btn-lg">
+                            Hủy bỏ
+                        </a>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Tips Sidebar -->
+        <div class="col-lg-4">
+            <div class="tips-card">
+                <h5 class="tips-title">
+                    <i class="bi bi-lightbulb me-2"></i>Mẹo đăng bán
+                </h5>
+                <ul class="tips-list">
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Đăng ảnh chất lượng cao, rõ nét</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Mô tả chi tiết tình trạng sản phẩm</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Đặt giá hợp lý với thị trường</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Trả lời tin nhắn nhanh chóng</span>
+                    </li>
+                </ul>
+
+                <div class="escrow-info-box">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                        <h6>Bảo vệ với Escrow</h6>
+                        <p>Tiền của người mua được giữ an toàn cho đến khi bạn xác nhận đã giao hàng.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    .create-product-page {
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        background: var(--white);
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .page-title i {
+        color: var(--primary);
+    }
+
+    .page-subtitle {
+        color: var(--gray-500);
+        margin-bottom: 0;
+    }
+
+    .form-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        padding: 1.5rem;
+    }
+
+    .form-section {
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .form-section:last-of-type {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: var(--primary);
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-label.required::after {
+        content: ' *';
+        color: var(--danger);
+    }
+
+    .input-with-suffix {
+        position: relative;
+    }
+
+    .input-with-suffix .form-control {
+        padding-right: 2.5rem;
+    }
+
+    .input-suffix {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        font-weight: 500;
+    }
+
+    .form-hint {
+        font-size: 0.8rem;
+        color: var(--gray-400);
+        margin-top: 0.35rem;
+    }
+
+    .product-type-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .type-option {
+        cursor: pointer;
+    }
+
+    .type-option input {
+        display: none;
+    }
+
+    .type-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.25rem;
+        background: var(--gray-50);
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        text-align: center;
+        transition: all var(--transition-base);
+    }
+
+    .type-option:hover .type-content {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+    }
+
+    .type-option.selected .type-content {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+    }
+
+    .type-content i {
+        font-size: 2rem;
+        color: var(--gray-400);
+        margin-bottom: 0.5rem;
+    }
+
+    .type-option:hover .type-content i,
+    .type-option.selected .type-content i {
+        color: var(--primary);
+    }
+
+    .type-title {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+
+    .type-desc {
+        font-size: 0.8rem;
+        color: var(--gray-500);
+    }
+
+    .upload-area {
+        position: relative;
+        border: 2px dashed var(--gray-300);
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        background: var(--gray-50);
+    }
+
+    .upload-area:hover {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+    }
+
+    .upload-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .upload-icon i {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+
+    .upload-content h5 {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.25rem;
+    }
+
+    .upload-content p {
+        color: var(--gray-500);
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+        font-size: 0.8rem;
+        color: var(--gray-400);
+    }
+
+    .preview-area {
+        position: relative;
+        margin-top: 1rem;
+    }
+
+    .preview-image {
+        width: 100%;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-200);
+    }
+
+    .remove-image {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        background: var(--danger);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .negotiable-option {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-md);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 28px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: var(--gray-300);
+        border-radius: 28px;
+        transition: var(--transition-base);
+    }
+
+    .toggle-slider::before {
+        content: '';
+        position: absolute;
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: var(--transition-base);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background: var(--primary);
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+        transform: translateX(24px);
+    }
+
+    .toggle-content {
+        flex: 1;
+    }
+
+    .toggle-title {
+        font-weight: 600;
+        color: var(--gray-800);
+        display: block;
+    }
+
+    .toggle-desc {
+        font-size: 0.85rem;
+        color: var(--gray-500);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-100);
+        margin-top: 1.5rem;
+    }
+
+    .form-actions .btn {
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+
+    .tips-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        padding: 1.5rem;
+        position: sticky;
+        top: 80px;
+    }
+
+    .tips-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .tips-title i {
+        color: var(--warning);
+    }
+
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.5rem;
+    }
+
+    .tips-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--gray-600);
+    }
+
+    .tips-list li i {
+        color: var(--success);
+        margin-top: 0.15rem;
+    }
+
+    .escrow-info-box {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(16, 185, 129, 0.05);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: var(--radius-md);
+    }
+
+    .escrow-info-box i {
+        font-size: 1.5rem;
+        color: var(--success);
+        flex-shrink: 0;
+    }
+
+    .escrow-info-box h6 {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+
+    .escrow-info-box p {
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        margin-bottom: 0;
+        line-height: 1.5;
+    }
+
+    @@media (max-width: 992px) {
+        .tips-card {
+            position: static;
+            margin-top: 1.5rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .product-type-options {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Image preview
         document.getElementById('coverImageInput')?.addEventListener('change', function (e) {
             const file = e.target.files?.[0];
             const wrap = document.getElementById('imagePreviewWrap');
-            const img = document.getElementById('imagePreview');
-            if (!file || !wrap || !img) return;
-            img.src = URL.createObjectURL(file);
+            const preview = document.getElementById('imagePreview');
+            const uploadArea = document.getElementById('uploadArea');
+            
+            if (!file || !wrap || !preview) return;
+            
+            preview.src = URL.createObjectURL(file);
             wrap.classList.remove('d-none');
+            uploadArea.classList.add('d-none');
+        });
+
+        function removeImage() {
+            const input = document.getElementById('coverImageInput');
+            const wrap = document.getElementById('imagePreviewWrap');
+            const uploadArea = document.getElementById('uploadArea');
+            
+            if (input) input.value = '';
+            if (wrap) wrap.classList.add('d-none');
+            if (uploadArea) uploadArea.classList.remove('d-none');
+        }
+
+        // Product type selection
+        document.querySelectorAll('.type-option input').forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+                this.closest('.type-option').classList.add('selected');
+            });
         });
     </script>
 }

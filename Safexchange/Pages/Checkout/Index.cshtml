@@ -4,93 +4,523 @@
     ViewData["Title"] = "Thanh toán";
 }
 
-<div class="row g-4">
-    <div class="col-lg-7">
-        <h1 class="h4 mb-3">Thông tin giao hàng</h1>
-        <div class="card shadow-sm border-0 mb-3">
-            <div class="card-body">
-                <form method="post" id="checkout-form">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="checkout-page">
 
-                    <div class="mb-3">
-                        <label asp-for="Form.ReceiverName" class="form-label fw-semibold"></label>
-                        <input asp-for="Form.ReceiverName" class="form-control" placeholder="Nguyễn Văn A" />
-                        <span asp-validation-for="Form.ReceiverName" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Form.Phone" class="form-label fw-semibold"></label>
-                        <input asp-for="Form.Phone" class="form-control" placeholder="0912345678" />
-                        <span asp-validation-for="Form.Phone" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Form.AddressLine" class="form-label fw-semibold"></label>
-                        <textarea asp-for="Form.AddressLine" class="form-control" rows="3"
-                                  placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
-                        <span asp-validation-for="Form.AddressLine" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Form.Note" class="form-label fw-semibold"></label>
-                        <input asp-for="Form.Note" class="form-control" placeholder="Giao giờ hành chính, gọi trước khi giao..." />
-                    </div>
-
-                    <div class="alert alert-light border mb-0">
-                        <div class="fw-semibold mb-1">Phương thức thanh toán</div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" checked disabled id="payCod" />
-                            <label class="form-check-label" for="payCod">
-                                Thanh toán khi nhận hàng (COD)
-                            </label>
-                        </div>
-                        <small class="text-muted">Bạn thanh toán trực tiếp cho shipper sau khi nhận và kiểm tra hàng.</small>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="bi bi-credit-card me-2"></i>Thanh toán
+        </h1>
+        <p class="page-subtitle">Hoàn tất đơn hàng của bạn</p>
     </div>
 
-    <div class="col-lg-5">
-        <h2 class="h5 mb-3">Đơn hàng (@Model.Items.Count sản phẩm)</h2>
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                @foreach (var item in Model.Items)
-                {
-                    <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
-                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+    <div class="row g-4">
+        <!-- Delivery Form -->
+        <div class="col-lg-7">
+            <div class="checkout-card">
+                <div class="card-header-custom">
+                    <div class="header-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h2 class="card-title">Thông tin giao hàng</h2>
+                </div>
+                <div class="card-body-custom">
+                    <form method="post" id="checkout-form">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="form-section">
+                            <h5 class="section-label">
+                                <i class="bi bi-person me-1"></i>Người nhận
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Form.ReceiverName" class="form-label required">Họ và tên</label>
+                                    <input asp-for="Form.ReceiverName" class="form-control" placeholder="Nguyễn Văn A" />
+                                    <span asp-validation-for="Form.ReceiverName" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Form.Phone" class="form-label required">Số điện thoại</label>
+                                    <input asp-for="Form.Phone" class="form-control" placeholder="0912345678" />
+                                    <span asp-validation-for="Form.Phone" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5 class="section-label">
+                                <i class="bi bi-geo-alt me-1"></i>Địa chỉ giao hàng
+                            </h5>
+                            <div class="form-group">
+                                <label asp-for="Form.AddressLine" class="form-label required">Địa chỉ chi tiết</label>
+                                <textarea asp-for="Form.AddressLine" class="form-control" rows="3" 
+                                          placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+                                <span asp-validation-for="Form.AddressLine" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5 class="section-label">
+                                <i class="bi bi-sticky me-1"></i>Ghi chú
+                            </h5>
+                            <div class="form-group">
+                                <label asp-for="Form.Note" class="form-label">Ghi chú cho người bán</label>
+                                <input asp-for="Form.Note" class="form-control" placeholder="VD: Giao giờ hành chính, gọi trước khi giao..." />
+                            </div>
+                        </div>
+
+                        <div class="form-section border-0">
+                            <h5 class="section-label">
+                                <i class="bi bi-wallet2 me-1"></i>Phương thức thanh toán
+                            </h5>
+                            <div class="payment-options">
+                                <label class="payment-option selected">
+                                    <input type="radio" name="payment" checked disabled />
+                                    <div class="option-content">
+                                        <div class="option-icon cod">
+                                            <i class="bi bi-cash"></i>
+                                        </div>
+                                        <div class="option-details">
+                                            <span class="option-title">Thanh toán khi nhận hàng (COD)</span>
+                                            <span class="option-desc">Bạn thanh toán trực tiếp cho shipper sau khi nhận và kiểm tra hàng</span>
+                                        </div>
+                                        <div class="option-check">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-5">
+            <div class="checkout-card summary-card">
+                <div class="card-header-custom">
+                    <div class="header-icon">
+                        <i class="bi bi-bag-check"></i>
+                    </div>
+                    <h2 class="card-title">Đơn hàng của bạn</h2>
+                </div>
+                <div class="card-body-custom">
+                    <!-- Items -->
+                    <div class="order-items">
+                        @foreach (var item in Model.Items)
                         {
-                            <img src="@item.ImageUrl" alt="" class="rounded checkout-thumb" />
+                            <div class="order-item">
+                                <div class="item-image">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="" />
+                                    }
+                                    else
+                                    {
+                                        <div class="placeholder">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="item-details">
+                                    <h5 class="item-title">@item.Title</h5>
+                                    <div class="item-meta">
+                                        <span>SL: @item.Quantity</span>
+                                        <span class="item-price">@item.UnitPrice.ToString("N0") đ</span>
+                                    </div>
+                                </div>
+                                <div class="item-total">
+                                    @item.LineTotal.ToString("N0") đ
+                                </div>
+                            </div>
                         }
-                        <div class="flex-grow-1">
-                            <div class="fw-semibold">@item.Title</div>
-                            <div class="text-muted small">SL: @item.Quantity × @item.UnitPrice.ToString("N0") đ</div>
-                            <div class="text-end fw-semibold">@item.LineTotal.ToString("N0") đ</div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="order-summary">
+                        <div class="summary-row">
+                            <span>Tạm tính</span>
+                            <span>@Model.Subtotal.ToString("N0") đ</span>
+                        </div>
+                        <div class="summary-row muted">
+                            <span>Phí giao hàng</span>
+                            <span>@Model.EstimatedShipping.ToString("N0") đ</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Tổng thanh toán</span>
+                            <span class="text-danger">@Model.EstimatedTotal.ToString("N0") đ</span>
                         </div>
                     </div>
-                }
 
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Tạm tính</span>
-                    <span>@Model.Subtotal.ToString("N0") đ</span>
-                </div>
-                <div class="d-flex justify-content-between mb-2 text-muted">
-                    <span>Phí giao hàng (ước tính)</span>
-                    <span>@Model.EstimatedShipping.ToString("N0") đ</span>
-                </div>
-                <div class="d-flex justify-content-between fw-bold fs-5 border-top pt-3">
-                    <span>Tổng thanh toán</span>
-                    <span class="text-danger">@Model.EstimatedTotal.ToString("N0") đ</span>
-                </div>
+                    <!-- Escrow Info -->
+                    <div class="escrow-box">
+                        <div class="escrow-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="escrow-content">
+                            <h6>Mua hàng an toàn với Escrow</h6>
+                            <p>Tiền của bạn được giữ bởi Safexchange cho đến khi xác nhận nhận được hàng đúng với mô tả.</p>
+                        </div>
+                    </div>
 
-                <button type="submit" form="checkout-form" class="btn btn-danger w-100 mt-3 py-2">
-                    Đặt hàng
-                </button>
-                <a asp-page="/Products/Index" class="btn btn-link w-100 mt-2">Tiếp tục mua sắm</a>
+                    <!-- Submit -->
+                    <button type="submit" form="checkout-form" class="btn btn-danger btn-lg w-100">
+                        <i class="bi bi-lock me-2"></i>Đặt hàng ngay
+                    </button>
+                    <a asp-page="/Products/Index" class="btn btn-link w-100 mt-2">
+                        <i class="bi bi-arrow-left me-1"></i>Tiếp tục mua sắm
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .checkout-page {
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .page-title i {
+        color: var(--primary);
+    }
+
+    .page-subtitle {
+        color: var(--gray-500);
+        margin-bottom: 0;
+    }
+
+    .checkout-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .card-header-custom {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.25rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .header-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-bg);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .header-icon i {
+        font-size: 1.1rem;
+        color: var(--primary);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0;
+    }
+
+    .card-body-custom {
+        padding: 1.5rem;
+    }
+
+    .form-section {
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .section-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 1rem;
+    }
+
+    .section-label i {
+        color: var(--primary);
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-label.required::after {
+        content: ' *';
+        color: var(--danger);
+    }
+
+    /* Payment Options */
+    .payment-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .payment-option {
+        cursor: pointer;
+    }
+
+    .payment-option input {
+        display: none;
+    }
+
+    .option-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--gray-50);
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        transition: all var(--transition-base);
+    }
+
+    .payment-option:hover .option-content {
+        border-color: var(--primary);
+    }
+
+    .payment-option.selected .option-content {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+    }
+
+    .option-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .option-icon.cod {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .option-icon i {
+        font-size: 1.25rem;
+    }
+
+    .option-details {
+        flex: 1;
+    }
+
+    .option-title {
+        display: block;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+
+    .option-desc {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--gray-500);
+    }
+
+    .option-check {
+        width: 28px;
+        height: 28px;
+        color: var(--gray-300);
+        flex-shrink: 0;
+    }
+
+    .payment-option.selected .option-check {
+        color: var(--primary);
+    }
+
+    /* Summary Card */
+    .summary-card {
+        position: sticky;
+        top: 80px;
+    }
+
+    .order-items {
+        margin-bottom: 1rem;
+    }
+
+    .order-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-image {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        flex-shrink: 0;
+        background: var(--gray-100);
+    }
+
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .item-image .placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-400);
+        font-size: 1.25rem;
+    }
+
+    .item-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .item-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--gray-500);
+    }
+
+    .item-price {
+        font-weight: 500;
+    }
+
+    .item-total {
+        font-weight: 600;
+        color: var(--gray-800);
+        white-space: nowrap;
+    }
+
+    .order-summary {
+        padding: 1rem 0;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .summary-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .summary-row.muted span:last-child {
+        color: var(--gray-500);
+    }
+
+    .summary-row.total {
+        padding-top: 0.75rem;
+        border-top: 1px dashed var(--gray-200);
+        margin-top: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .escrow-box {
+        display: flex;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: rgba(16, 185, 129, 0.05);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: var(--radius-md);
+        margin: 1rem 0;
+    }
+
+    .escrow-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--success);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .escrow-icon i {
+        font-size: 1.1rem;
+        color: white;
+    }
+
+    .escrow-content h6 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+
+    .escrow-content p {
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        margin-bottom: 0;
+        line-height: 1.4;
+    }
+
+    @@media (max-width: 992px) {
+        .summary-card {
+            position: static;
+        }
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
