@@ -57,75 +57,91 @@ public class ChatHub : Hub
 
     public async Task SendMessage(int conversationId, string messageText, string? attachmentUrl = null)
     {
-        var senderId = _currentUser.GetUserId();
-        var now = DateTime.UtcNow;
-
-        // Create the message
-        var message = new Message
+        try
         {
-            ConversationId = conversationId,
-            SenderId = senderId,
-            MessageText = messageText,
-            AttachmentUrl = attachmentUrl,
-            IsRead = false,
-            CreatedAt = now
-        };
+            var senderId = _currentUser.GetUserId();
+            var now = DateTime.UtcNow;
 
-        _db.Messages.Add(message);
-        
-        // Update conversation status
-        var conversation = await _db.Conversations.FindAsync(conversationId);
-        if (conversation != null)
-        {
-            conversation.Status = "active";
-        }
-        
-        await _db.SaveChangesAsync();
-
-        // Get sender info
-        var sender = await _db.Users.FindAsync(senderId);
-
-        // Broadcast to everyone in the conversation group
-        await Clients.Group($"conversation_{conversationId}").SendAsync("ReceiveMessage", new
-        {
-            messageId = message.MessageId,
-            conversationId = message.ConversationId,
-            senderId = message.SenderId,
-            senderName = sender?.FullName ?? "Unknown",
-            messageText = message.MessageText,
-            attachmentUrl = message.AttachmentUrl,
-            createdAt = message.CreatedAt.ToString("o"),
-            isRead = message.IsRead
-        });
-
-        // Also send notification to the other user (buyer or seller)
-        if (conversation != null)
-        {
-            var recipientId = conversation.BuyerId == senderId ? conversation.SellerId : conversation.BuyerId;
-            
-            // Create notification in database
-            await _notificationService.CreateNotificationAsync(
-                recipientId,
-                $"Tin nhắn mới từ {sender?.FullName ?? "Người dùng"}",
-                messageText.Length > 100 ? messageText[..100] + "..." : messageText,
-                "chat",
-                $"/Chat/Index/{conversationId}"
-            );
-
-            // Send real-time notification via SignalR
-            await Clients.Group($"user_{recipientId}").SendAsync("NewMessageNotification", new
+            // Create the message
+            var message = new Message
             {
-                conversationId = conversationId,
-                productId = conversation.ProductId,
-                senderName = sender?.FullName ?? "Someone",
-                preview = messageText.Length > 50 ? messageText[..50] + "..." : messageText,
+                ConversationId = conversationId,
+                SenderId = senderId,
+                MessageText = messageText,
+                AttachmentUrl = attachmentUrl,
+                IsRead = false,
+                CreatedAt = now
+            };
+
+            _db.Messages.Add(message);
+            
+            // Update conversation status
+            var conversation = await _db.Conversations.FindAsync(conversationId);
+            if (conversation != null)
+            {
+                conversation.Status = "active";
+            }
+            
+            await _db.SaveChangesAsync();
+
+            // Get sender info
+            var sender = await _db.Users.FindAsync(senderId);
+
+            // Broadcast to everyone in the conversation group
+            await Clients.Group($"conversation_{conversationId}").SendAsync("ReceiveMessage", new
+            {
                 messageId = message.MessageId,
-                title = $"Tin nhắn mới từ {sender?.FullName ?? "Người dùng"}",
-                content = messageText.Length > 100 ? messageText[..100] + "..." : messageText,
-                icon = "bi-chat-dots",
-                iconClass = "bg-info",
-                linkUrl = $"/Chat/Index/{conversationId}"
+                conversationId = message.ConversationId,
+                senderId = message.SenderId,
+                senderName = sender?.FullName ?? "Unknown",
+                messageText = message.MessageText,
+                attachmentUrl = message.AttachmentUrl,
+                createdAt = message.CreatedAt.ToString("o"),
+                isRead = message.IsRead
             });
+
+            // Also send notification to the other user (buyer or seller)
+            if (conversation != null)
+            {
+                try
+                {
+                    var recipientId = conversation.BuyerId == senderId ? conversation.SellerId : conversation.BuyerId;
+                    
+                    // Create notification in database
+                    await _notificationService.CreateNotificationAsync(
+                        recipientId,
+                        $"Tin nhắn mới từ {sender?.FullName ?? "Người dùng"}",
+                        messageText.Length > 100 ? messageText[..100] + "..." : messageText,
+                        "chat",
+                        $"/Chat/Index/{conversationId}"
+                    );
+
+                    // Send real-time notification via SignalR
+                    await Clients.Group($"user_{recipientId}").SendAsync("NewMessageNotification", new
+                    {
+                        conversationId = conversationId,
+                        productId = conversation.ProductId,
+                        senderName = sender?.FullName ?? "Someone",
+                        preview = messageText.Length > 50 ? messageText[..50] + "..." : messageText,
+                        messageId = message.MessageId,
+                        title = $"Tin nhắn mới từ {sender?.FullName ?? "Người dùng"}",
+                        content = messageText.Length > 100 ? messageText[..100] + "..." : messageText,
+                        icon = "bi-chat-dots",
+                        iconClass = "bg-info",
+                        linkUrl = $"/Chat/Index/{conversationId}"
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // Log but don't fail - notification is optional
+                    Console.WriteLine($"Notification error (non-critical): {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SendMessage error: {ex.Message}");
+            throw; // Re-throw so client knows there was an error
         }
     }
 

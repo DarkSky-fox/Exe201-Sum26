@@ -116,6 +116,7 @@ const Chat = (function () {
             }
 
             try {
+                const messageText = input.value.trim();
                 input.value = "";
                 input.disabled = true;
 
@@ -126,7 +127,6 @@ const Chat = (function () {
                 input.focus();
             } catch (err) {
                 console.error("Failed to send message:", err);
-                input.value = messageText; // Restore message
                 input.disabled = false;
                 showError("Không thể gửi tin nhắn. Vui lòng thử lại.");
             }

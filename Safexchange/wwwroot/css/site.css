@@ -60,12 +60,7 @@ html {
   font-size: 14px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
+/* Allow horizontal scroll only when needed, don't clip vertical */
 body {
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--gray-800);
@@ -73,6 +68,71 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fix Bootstrap row overflow */
+.row {
+  margin-left: 0;
+  margin-right: 0;
+  flex-wrap: wrap;
+}
+
+/* Container - no overflow clipping for dropdowns */
+.container,
+.container-fluid {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  min-width: 0;
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .container,
+  .container-fluid {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Limit heading sizes on small screens */
+.display-4 {
+  font-size: 2rem !important;
+}
+
+@media (min-width: 768px) {
+  .display-4 {
+    font-size: 2.5rem !important;
+  }
+}
+
+/* Container fix for small screens */
+.container,
+.container-fluid {
+  overflow-x: hidden;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .container,
+  .container-fluid {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Column min-width fix */
+.col, .col-auto, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+.col-7, .col-8, .col-9, .col-10, .col-11, .col-12,
+.col-sm, .col-sm-auto, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4,
+.col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10,
+.col-sm-11, .col-sm-12, .col-md, .col-md-auto, .col-md-1, .col-md-2,
+.col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8,
+.col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-auto,
+.col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6,
+.col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {
+  min-width: 0;
 }
 
 /* Focus States - More prominent */
@@ -237,6 +297,20 @@ body.layout-with-sidebar > main {
   border-bottom: 1px solid var(--gray-200);
   padding: 0.65rem 0;
   box-shadow: var(--shadow-sm);
+  overflow: visible;
+}
+
+/* Ensure dropdown menus appear above other content */
+.dropdown-menu {
+  z-index: 1050 !important;
+  margin-top: 0.5rem;
+  overflow: visible;
+}
+
+/* Prevent navbar container from clipping dropdowns */
+.top-navbar .container-fluid {
+  position: relative;
+  overflow: visible;
 }
 
 .top-navbar .navbar-brand {
@@ -314,13 +388,18 @@ body.layout-with-sidebar > main {
   transform: scale(1.05);
 }
 
+/* ==================== LAYOUT VARIABLES ==================== */
+:root {
+  --sidebar-width: clamp(200px, 22vw, 260px);
+}
+
 /* Sidebar - Enhanced */
 .sidebar {
   position: fixed;
   top: 56px;
   left: 0;
   bottom: 0;
-  width: 270px;
+  width: var(--sidebar-width);
   background: var(--white);
   border-right: 1px solid var(--gray-200);
   overflow-y: auto;
@@ -487,6 +566,16 @@ body.layout-with-sidebar > main {
   margin-top: 56px;
   min-height: calc(100vh - 56px);
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 100%;
+  overflow: visible;
+}
+
+/* Content Wrapper - Handles sidebar spacing for all children */
+.content-wrapper {
+  position: relative;
+  min-height: 100vh;
+  padding-left: var(--sidebar-width);
+  overflow: visible;
 }
 
 /* Sidebar visible on desktop */
@@ -496,19 +585,10 @@ body.layout-with-sidebar > main {
   }
 
   .main-content {
-    margin-left: 270px;
+    margin-left: 0;
   }
 
   .top-navbar .sidebar-toggle-btn {
-    display: none;
-  }
-}
-  
-  .main-content {
-    margin-left: 260px;
-  }
-  
-  .sidebar-toggle-btn {
     display: none;
   }
 }
@@ -518,13 +598,57 @@ body.layout-with-sidebar > main {
     display: block;
     opacity: 1;
   }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .content-wrapper {
+    padding-left: 0;
+  }
 }
 
 /* ==================== NOTIFICATIONS ==================== */
 .notification-dropdown {
-  max-height: 400px;
-  overflow-y: auto;
+  max-height: none;
+  max-width: 400px;
+  overflow-y: visible;
   padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Profile dropdown menu styling */
+.navbar .dropdown-menu,
+.top-navbar .dropdown-menu {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.5rem;
+  min-width: 220px;
+}
+
+.navbar .dropdown-menu .dropdown-item,
+.top-navbar .dropdown-menu .dropdown-item {
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: background-color 0.2s ease;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover,
+.top-navbar .dropdown-menu .dropdown-item:hover {
+  background-color: var(--gray-100);
+}
+
+.navbar .dropdown-menu .dropdown-item i,
+.top-navbar .dropdown-menu .dropdown-item i {
+  width: 20px;
+  text-align: center;
+  color: var(--primary);
 }
 
 .notification-list {
@@ -1066,6 +1190,21 @@ body.layout-with-sidebar > main {
 
 .page-main {
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.page-main.container {
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .page-main.container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 /* Products List Page */
@@ -1121,14 +1260,17 @@ body.layout-with-sidebar > main {
 .categories-section {
   background: #fff;
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-sm);
+  overflow-x: hidden;
 }
 
 .categories-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .categories-row .category-card {
@@ -1141,24 +1283,15 @@ body.layout-with-sidebar > main {
   text-decoration: none;
   transition: all 0.25s ease;
   border: 2px solid transparent;
-}
-
-.categories-row .category-card:hover {
-  background: var(--primary-bg);
-  border-color: var(--primary);
-  transform: translateY(-2px);
-}
-
-.categories-row .category-card.active {
-  background: var(--primary-bg);
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  text-align: center;
+  min-width: 0;
+  word-wrap: break-word;
 }
 
 .categories-row .category-card i {
   font-size: 1.75rem;
   color: var(--primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
 .categories-row .category-card h6 {
@@ -1167,20 +1300,20 @@ body.layout-with-sidebar > main {
   color: var(--gray-700);
   margin: 0;
   text-align: center;
-}
-
-.categories-row .category-card.active h6 {
-  color: var(--primary-dark);
+  line-height: 1.2;
+  word-wrap: break-word;
 }
 
 /* Mobile Categories */
-@media (max-width: 575.98px) {
+@media (max-width: 991.98px) {
   .categories-section {
     padding: 1rem;
+    border-radius: var(--radius-md);
+    margin: 0 -0.5rem;
   }
 
   .categories-row {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
     gap: 0.5rem;
   }
 
@@ -1190,18 +1323,37 @@ body.layout-with-sidebar > main {
 
   .categories-row .category-card i {
     font-size: 1.5rem;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.25rem;
   }
 
   .categories-row .category-card h6 {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+
+  .categories-section .section-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
   }
 }
 
 /* Extra small mobile */
-@media (max-width: 375px) {
+@media (max-width: 575.98px) {
   .categories-row {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+  }
+
+  .categories-row .category-card {
+    padding: 0.6rem 0.15rem;
+  }
+
+  .categories-row .category-card i {
+    font-size: 1.35rem;
+  }
+
+  .categories-row .category-card h6 {
+    font-size: 0.65rem;
   }
 }
 
@@ -1222,6 +1374,7 @@ body.layout-fullwidth {
   padding: 4rem 0;
   position: relative;
   overflow: hidden;
+  max-width: 100vw;
 }
 
 .home-page .hero-section::before {
@@ -1362,6 +1515,8 @@ body.layout-fullwidth {
   position: relative;
   z-index: 10;
   margin-top: -2rem;
+  width: 100%;
+  overflow: hidden;
 }
 
 .search-form {
@@ -2336,7 +2491,7 @@ body.layout-fullwidth {
 
 .form-inline .form-group {
   flex: 1;
-  min-width: 200px;
+  min-width: 0;
 }
 
 /* ==================== STATUS BADGES ==================== */

@@ -25,9 +25,48 @@ public class IndexModel : PageModel
     public Conversation? SelectedConversation { get; set; }
     public List<Message> Messages { get; set; } = new();
 
-    public async Task<IActionResult> OnGetAsync(int? id = null)
+    public async Task<IActionResult> OnGetAsync(int? id = null, int? productId = null)
     {
         CurrentUserId = _currentUser.GetUserId();
+
+        // Nếu có productId nhưng không có id, tìm hoặc tạo conversation
+        if (productId.HasValue && !id.HasValue)
+        {
+            var buyerId = CurrentUserId;
+
+            // Tìm conversation đã tồn tại
+            var existingConv = await _db.Conversations
+                .FirstOrDefaultAsync(c => c.ProductId == productId.Value && c.BuyerId == buyerId);
+
+            if (existingConv != null)
+            {
+                // Redirect đến conversation đã có
+                return RedirectToPage("/Chat/Index", new { id = existingConv.ConversationId });
+            }
+
+            // Tạo conversation mới
+            var product = await _db.Products.FindAsync(productId.Value);
+            if (product != null)
+            {
+                var newConversation = new Conversation
+                {
+                    ProductId = productId.Value,
+                    BuyerId = buyerId,
+                    SellerId = product.SellerId,
+                    Status = "active",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _db.Conversations.Add(newConversation);
+                await _db.SaveChangesAsync();
+
+                // Redirect đến conversation mới
+                return RedirectToPage("/Chat/Index", new { id = newConversation.ConversationId });
+            }
+
+            // Nếu sản phẩm không tồn tại, quay lại trang chat bình thường
+            return RedirectToPage("/Chat/Index");
+        }
 
         var conversations = await _db.Conversations
             .Include(c => c.Buyer)

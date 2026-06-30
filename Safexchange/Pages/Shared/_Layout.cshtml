@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>@ViewData["Title"] - Safexchange</title>
 
     <!-- Google tag (gtag.js) -->
@@ -207,24 +207,26 @@
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content" id="main-content">
-        @if (ViewData["FullWidth"] as bool? == true)
-        {
-            <div class="page-main pb-4">
-                @RenderBody()
-            </div>
-        }
-        else
-        {
-            <div class="page-main container pb-4">
-                @RenderBody()
-            </div>
-        }
-    </main>
+    <!-- CONTENT WRAPPER - Handles sidebar spacing -->
+    <div class="content-wrapper">
+        <!-- MAIN CONTENT -->
+        <main class="main-content" id="main-content">
+            @if (ViewData["FullWidth"] as bool? == true)
+            {
+                <div class="page-main pb-4">
+                    @RenderBody()
+                </div>
+            }
+            else
+            {
+                <div class="page-main container pb-4">
+                    @RenderBody()
+                </div>
+            }
+        </main>
 
-    <!-- Main Footer -->
-    <footer class="main-footer py-5">
+        <!-- Main Footer -->
+        <footer class="main-footer py-5">
         <div class="container">
             <div class="row g-4">
                 <!-- Company Info -->
@@ -373,6 +375,8 @@
             <span>Tài khoản</span>
         </a>
     </nav>
+
+    </div><!-- End content-wrapper -->
 
     <script>document.addEventListener('DOMContentLoaded', function () {
         Cart.refreshBadge();
